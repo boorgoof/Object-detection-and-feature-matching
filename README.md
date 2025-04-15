@@ -14,4 +14,5 @@ Task:
     - Brute force
     - Flann based matcher
 - Bounding box
-    -
+    - https://stackoverflow.com/questions/51606215/how-to-draw-bounding-box-on-best-matches
+    - Viola & Jones automatic bounding box
