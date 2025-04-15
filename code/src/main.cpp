@@ -2,7 +2,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "Dataset.h"
+#include "../include/Dataset.h"
 
 int main(int argc, const char* argv[]){
     std::string path("../dataset/004_sugar_box");
