@@ -1,4 +1,8 @@
+#ifndef LABEL_H
+#define LABEL_H
+
 #include <string>
+#include <map>
 #include <opencv2/opencv.hpp>
 
 class Object_Type{
@@ -10,14 +14,15 @@ class Object_Type{
     };
     Object_Type(const std::string& type) : type{string_to_enum(type)} {};
     Object_Type(const Type& type) : type{type} {};
-    const std::string& to_string();
+    const std::string& to_string() const;
     const Type& get_type() const {return this->type;}
     void set_type(const Type& new_type) {this->type = new_type;}
     void set_type(const std::string& type) {this->type = string_to_enum(type);}
 
     static const Type& string_to_enum(const std::string& type);
     static std::map<std::string, Type> associative_map;
-
+    static std::map<Type, std::string> associative_map_reverse;
+    
     private:
     Type type;
 };
@@ -34,15 +39,7 @@ class Label{
     void set_bounding_box(const cv::Rect& new_bb) {this->bb = new_bb;}
 };
 
-size_t split_string(const std::string& str, std::vector<std::string>& tokens, char delimiter);
-std::vector<std::string> get_folder_filenames(const std::string& folderpath);
+std::ostream& operator<<(std::ostream& os, const Label& l);
+std::ostream& operator<<(std::ostream& os, const Object_Type& o);
 
-
-namespace LoaderUtils{
-
-    cv::Mat load_image(const std::string& filepath);
-    std::vector<Label> load_label_file(const std::string& filepath);
-    std::vector<cv::Mat> load_folder_images(const std::string& folderpath);
-    std::vector<Label> load_folder_labels(const std::string& folderpath);
-
-};
+#endif
