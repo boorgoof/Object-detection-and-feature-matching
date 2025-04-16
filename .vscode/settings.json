@@ -1,9 +1,17 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "stdexcept": "cpp",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
+=======
+        "array": "cpp",
+        "atomic": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+>>>>>>> 5b9d700d04dbd08d5799284e6e79ccdfdeca6e48
         "cctype": "cpp",
         "charconv": "cpp",
         "chrono": "cpp",
@@ -45,7 +53,10 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
+<<<<<<< HEAD
         "format": "cpp",
+=======
+>>>>>>> 5b9d700d04dbd08d5799284e6e79ccdfdeca6e48
         "fstream": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
@@ -60,11 +71,30 @@
         "semaphore": "cpp",
         "span": "cpp",
         "sstream": "cpp",
+<<<<<<< HEAD
         "stop_token": "cpp",
         "streambuf": "cpp",
         "text_encoding": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp"
+=======
+        "stdexcept": "cpp",
+        "stop_token": "cpp",
+        "streambuf": "cpp",
+        "thread": "cpp",
+        "typeinfo": "cpp",
+        "variant": "cpp",
+        "format": "cpp",
+        "__nullptr": "cpp",
+        "__split_buffer": "cpp",
+        "__node_handle": "cpp",
+        "filesystem": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "__hash_table": "cpp",
+        "__tree": "cpp",
+        "__bit_reference": "cpp"
+>>>>>>> 5b9d700d04dbd08d5799284e6e79ccdfdeca6e48
     }
 }
