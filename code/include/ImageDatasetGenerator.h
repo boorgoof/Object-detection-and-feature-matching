@@ -7,7 +7,7 @@
 
 class ImageDatasetGenerator{
     public:
-    void generateRotatedImages(const std::string&, const std::string&, int);
+    void generateRotatedImages(const std::string&,  const std::string&, const std::string&, int);
 
 };
 

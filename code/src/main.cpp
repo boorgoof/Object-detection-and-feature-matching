@@ -23,6 +23,13 @@ int main(int argc, const char* argv[]){
         }
         std::cout << std::endl;
     }
+    ImageDatasetGenerator generator;
+    std::string inputFolder = "004_sugar_box/models";
+    std::string Image = "/home/gian-pc/Desktop/MiddleProject_ComputerVision/dataset/035_power_drill/models/view_0_000_color.png";
+    std::string Mask = "/home/gian-pc/Desktop/MiddleProject_ComputerVision/dataset/035_power_drill/models/view_0_000_mask.png";
+    std::string outputFolder = "/home/gian-pc/Desktop/MiddleProject_ComputerVision/Image_generated/Power_drill_Generated";
+
+    generator.generateRotatedImages(Image,Mask ,outputFolder, 10);
 }
 
 
