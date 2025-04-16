@@ -1,3 +1,0 @@
-/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/main.dir
-/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/edit_cache.dir
-/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/rebuild_cache.dir
