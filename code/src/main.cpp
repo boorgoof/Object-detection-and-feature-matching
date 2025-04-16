@@ -1,26 +1,44 @@
 #include <iostream>
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
-
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 
 int main(int argc, const char* argv[]){
-    std::string path("../dataset/004_sugar_box");
-    std::string label_folder("labels");
-    std::string images_folder("models");
 
-    std::string final_imgs_path = path+"/"+images_folder;
-    std::string final_lbls_path = path+"/"+label_folder;
+    std::string dataset_path = "../dataset";
+    std::string output_path = "../output";
 
-    Dataset sugarbox_dataset(Object_Type("004_sugar_box"), path);
-    std::cout << sugarbox_dataset << std::endl;
-
-    auto items = sugarbox_dataset.get_items();
-
-    for(auto it = items.begin(); it != items.end(); ++it){
-        std::cout << "item: \n" <<  (*it) << std::endl;
+    if(argc >= 2){
+        dataset_path = argv[1];
     }
+    if(argc >= 3){
+        output_path = argv[2];
+    }
+    else{
+        std::cout << "NO COMMAND LINE PARAMETERS, USING DEFAULT" << std::endl;
+    }
+
+    std::vector<std::string> dataset_subfolders = Utils::Directory::get_folder_filenames(dataset_path);
+
+    std::vector<Dataset> datasets;
+
+    for(auto it=dataset_subfolders.begin(); it != dataset_subfolders.end(); ++it){
+        std::vector<std::string> tokens;
+        const size_t n_f = Utils::String::split_string(*it, tokens, '/');
+        datasets.push_back(Dataset(Object_Type(tokens[n_f-1]), *it));
+    }
+
+    for(auto it=datasets.begin(); it != datasets.end(); ++it){
+
+        std::cout << "DATASET" << *it << std::endl;
+
+        auto items = (*it).get_items();
+        for(auto it2 = items.begin(); it2 != items.end(); ++it2){
+            std::cout << "item: \n" <<  (*it2) << std::endl;
+        }
+    }
+    
 
     /*
     std::vector<cv::Mat> images, masks;

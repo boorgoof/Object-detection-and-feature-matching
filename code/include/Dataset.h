@@ -14,10 +14,6 @@ class Dataset{
 
     public:
     Dataset(const Object_Type& type, const std::string& folderpath = "");
-    Dataset(const Dataset&) = delete;
-    Dataset(Dataset&&) = delete;
-    Dataset& operator=(const Dataset&) = delete;
-    Dataset& operator=(Dataset&&) = delete;
 
     const size_t load_items(const std::string& folderpath);
 
