@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <iostream>
+#include "../include/CustomErrors.h"
 
 //https://stackoverflow.com/questions/5888022/split-string-by-single-spaces
 const size_t Utils::String::split_string(const std::string& str, std::vector<std::string>& tokens, char delimiter){
@@ -30,14 +31,14 @@ std::vector<std::string> Utils::Directory::get_folder_filenames(const std::strin
         filenames.push_back(entry.path());
     }
 
-    if(filenames.size() == 0) throw std::runtime_error("NO FILES IN FOLDER: "+folderpath);
+    if(filenames.size() == 0) throw CustomErrors::EmptyFolderError(folderpath, "NO FILES IN FOLDER");
 
     return filenames;
 }
 
 cv::Mat Utils::Loader::load_image(const std::string& filepath) {
     cv::Mat img = cv::imread(filepath);
-    if(img.empty()) throw std::runtime_error("COULD NOT OPEN FILE: "+filepath);
+    if(img.empty()) throw CustomErrors::ImageLoadError(filepath,"COULD NOT OPEN FILE");
 
     std::string filename = filepath.substr(filepath.find_last_of("/")+1);
     std::string base_filename = filename.substr(0, filename.find_first_of('.'));
@@ -48,7 +49,7 @@ cv::Mat Utils::Loader::load_image(const std::string& filepath) {
     else if(base_filename.find("color") != std::string::npos){
         img = cv::imread(filepath, cv::IMREAD_COLOR);
     }
-    else throw std::runtime_error("FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
+    else throw CustomErrors::FileNameError(filename, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
 
     return img;
 }
@@ -62,14 +63,14 @@ std::vector<Label> Utils::Loader::load_label_file(const std::string& filepath){
             std::vector<std::string> tokens;
             size_t n = Utils::String::split_string(line, tokens, ' ');
 
-            if(n!=5) throw std::runtime_error("LABEL FILE LINE DOES NOT MATCH LABEL FORMAT (class_name p1x p1y p2x p2y): "+line);
+            if(n!=5) throw CustomErrors::LabelFormatError(line,"LABEL FILE LINE DOES NOT MATCH LABEL FORMAT (class_name p1x p1y p2x p2y)");
             cv::Point2i p1(std::stoi(tokens[1]), std::stoi(tokens[2]));
             cv::Point2i p2(std::stoi(tokens[3]), std::stoi(tokens[4]));
             labels.push_back(Label(Object_Type(tokens[0]), cv::Rect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)));
         }
         myfile.close();
     }
-    else throw std::runtime_error("COULD NOT OPEN FILE: "+filepath);
+    else throw CustomErrors::ImageLoadError(filepath,"COULD NOT OPEN FILE");
 
     return labels;
 }
