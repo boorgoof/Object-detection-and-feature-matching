@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/mnt/d/LAB_computer_vision/INTERMEDIATE_PROJECT/MiddleProject_ComputerVision/code/src/Dataset.cpp" "CMakeFiles/main.dir/code/src/Dataset.cpp.o" "gcc" "CMakeFiles/main.dir/code/src/Dataset.cpp.o.d"
-  "/mnt/d/LAB_computer_vision/INTERMEDIATE_PROJECT/MiddleProject_ComputerVision/code/src/main.cpp" "CMakeFiles/main.dir/code/src/main.cpp.o" "gcc" "CMakeFiles/main.dir/code/src/main.cpp.o.d"
+  "/home/gian-pc/Desktop/MiddleProject_ComputerVision/code/src/ImageDatasetGenerator.cpp" "CMakeFiles/main.dir/code/src/ImageDatasetGenerator.cpp.o" "gcc" "CMakeFiles/main.dir/code/src/ImageDatasetGenerator.cpp.o.d"
+  "/home/gian-pc/Desktop/MiddleProject_ComputerVision/code/src/MainGenerator.cpp" "CMakeFiles/main.dir/code/src/MainGenerator.cpp.o" "gcc" "CMakeFiles/main.dir/code/src/MainGenerator.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

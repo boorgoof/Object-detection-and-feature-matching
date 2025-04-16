@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.dir/code/src/Dataset.cpp.o"
-  "CMakeFiles/main.dir/code/src/Dataset.cpp.o.d"
-  "CMakeFiles/main.dir/code/src/main.cpp.o"
-  "CMakeFiles/main.dir/code/src/main.cpp.o.d"
+  "CMakeFiles/main.dir/code/src/ImageDatasetGenerator.cpp.o"
+  "CMakeFiles/main.dir/code/src/ImageDatasetGenerator.cpp.o.d"
+  "CMakeFiles/main.dir/code/src/MainGenerator.cpp.o"
+  "CMakeFiles/main.dir/code/src/MainGenerator.cpp.o.d"
   "main"
   "main.pdb"
 )

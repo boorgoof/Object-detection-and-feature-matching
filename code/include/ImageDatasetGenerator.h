@@ -9,8 +9,6 @@ class ImageDatasetGenerator{
     public:
     void generateRotatedImages(const std::string&, const std::string&, int);
 
-    //private:
-
 };
 
 

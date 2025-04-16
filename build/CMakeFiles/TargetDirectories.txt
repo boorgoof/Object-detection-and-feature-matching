@@ -1,3 +1,3 @@
-/mnt/d/LAB_computer_vision/INTERMEDIATE_PROJECT/MiddleProject_ComputerVision/build/CMakeFiles/main.dir
-/mnt/d/LAB_computer_vision/INTERMEDIATE_PROJECT/MiddleProject_ComputerVision/build/CMakeFiles/edit_cache.dir
-/mnt/d/LAB_computer_vision/INTERMEDIATE_PROJECT/MiddleProject_ComputerVision/build/CMakeFiles/rebuild_cache.dir
+/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/main.dir
+/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/edit_cache.dir
+/home/gian-pc/Desktop/MiddleProject_ComputerVision/build/CMakeFiles/rebuild_cache.dir

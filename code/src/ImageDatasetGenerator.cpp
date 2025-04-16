@@ -1,5 +1,5 @@
-#include "ImageDatasetGenerator.h"
-
+#include "../include/ImageDatasetGenerator.h"
+#include "../include/CustomErrors.h"
 
 void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage, const std::string& outputFolder, int numImages) {
     namespace fs = std::filesystem;
@@ -11,8 +11,7 @@ void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage,
 
     cv::Mat src = cv::imread(inputImage);
     if (src.empty()) {
-        std::cerr << "Error loading image: " << inputImage << std::endl;
-        return;
+        throw CustomErrors::ImageLoadError("Error loading image: " , inputImage);
     }
 
     cv::Point2f center(src.cols / 2.0f, src.rows / 2.0f);
