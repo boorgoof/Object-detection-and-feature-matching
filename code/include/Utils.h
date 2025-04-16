@@ -18,12 +18,13 @@ namespace Utils{
 
     namespace Directory{
         std::vector<std::string> get_folder_filenames(const std::string& folderpath);
+        const std::string get_file_basename(const std::string& filepath);
+        const std::string remove_file_suffix(const std::string& filepath, char delimiter);
         const size_t split_model_img_masks(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames);
     }
 
     namespace String{
         const size_t split_string(const std::string& str, std::vector<std::string>& tokens, char delimiter);
-        const std::string get_file_raw_basename(const std::string& filepath, char delimiter);
     }
 
     //https://stackoverflow.com/questions/54398336/stl-type-for-mapping-one-to-one-relations

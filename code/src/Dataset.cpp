@@ -37,10 +37,15 @@ const size_t Dataset::load_items(const std::string& folderpath){
     std::vector<std::string>::iterator it_i = test_images_filenames.begin();
     for(std::vector<std::string>::iterator it_l = labels_filenames.begin(); it_l != labels_filenames.end(); ++it_l){
         //raw filenames (eliminate path, keep just the file name deleting the extension and the suffix (i.e. -color or -box))
-        const std::string test_image_file_basename = Utils::String::get_file_raw_basename(*it_i,'-');
-        const std::string label_file_basename = Utils::String::get_file_raw_basename(*it_l,'-');
+        const std::string test_image_file_basename = Utils::Directory::get_file_basename(*it_i);
+        const std::string test_image_file_name_raw = Utils::Directory::remove_file_suffix(test_image_file_basename,'-');
+
+        const std::string label_file_basename = Utils::Directory::get_file_basename(*it_l);
+        const std::string label_file_name_raw = Utils::Directory::remove_file_suffix(label_file_basename,'-');
+
+        std::cout << label_file_name_raw << " " << test_image_file_name_raw << std::endl;
         //if the 2 row filenames are the same -> the pair of label-image is correct
-        if(test_image_file_basename.compare(label_file_basename) == 0){
+        if(test_image_file_name_raw.compare(label_file_name_raw) == 0){
             //filenames match, load label and store image filename in vector of items
             this->items.push_back(std::pair<std::vector<Label>, std::string>(Utils::Loader::load_label_file((*it_l)), *it_i));
         }
