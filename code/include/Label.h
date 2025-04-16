@@ -27,6 +27,8 @@ class Object_Type{
     Type type;
 };
 
+bool operator<(const Object_Type& lhs, const Object_Type& rhs);
+
 class Label{
     private:
     Object_Type class_name;

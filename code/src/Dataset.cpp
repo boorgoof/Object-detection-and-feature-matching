@@ -63,7 +63,7 @@ std::ostream& operator<<(std::ostream& os, const std::pair<std::vector<Label>, s
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Label>& v){
     for(auto it = v.begin(); it != v.end(); ++it){
-        os << "\t" << (*it) << std::endl;
+        os << "\t" << *it << std::endl;
     }
 
     return os;

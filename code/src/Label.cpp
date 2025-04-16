@@ -15,6 +15,10 @@ const std::string& Object_Type::to_string() const {
     return associative_map_reverse[this->get_type()];
 }
 
+bool operator<(const Object_Type& lhs, const Object_Type& rhs){
+    return lhs.get_type() < rhs.get_type();
+}
+
 std::ostream& operator<<(std::ostream& os, const Label& l){
     os << l.get_class_name() << " " << l.get_bounding_box();
     return os;
