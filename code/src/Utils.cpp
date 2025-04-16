@@ -25,10 +25,13 @@ const size_t Utils::String::split_string(const std::string& str, std::vector<std
     return tokens.size();
 }
 
-const std::string Utils::String::get_file_raw_basename(const std::string& filepath, char delimiter){
+const std::string Utils::Directory::get_file_basename(const std::string& filepath){
     std::string filename = filepath.substr(filepath.find_last_of("/")+1);
-    std::string base_filename = filename.substr(0, filename.find_first_of('.'));
-    return base_filename.substr(0, base_filename.find_first_of(delimiter));
+    return filename.substr(0, filename.find_first_of('.'));
+}
+
+const std::string Utils::Directory::remove_file_suffix(const std::string& file_basename, char delimiter){
+    return file_basename.substr(0, file_basename.find_last_of(delimiter));
 }
 
 std::vector<std::string> Utils::Directory::get_folder_filenames(const std::string& folderpath){
