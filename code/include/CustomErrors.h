@@ -78,7 +78,18 @@ namespace CustomErrors {
         private:
             std::string image_filename;
             std::string label_filename;
-        };
+    };
+
+    class ImageMaskMismatch : public std::runtime_error {
+        public:
+        ImageMaskMismatch(const std::string& image_filename, const std::string& mask_filename, const std::string& message)
+                : std::runtime_error(message), image_filename(image_filename), mask_filename{mask_filename} {}
+            const std::string& getImageFilename() const { return image_filename; }
+            const std::string& getLabelFilename() const { return mask_filename; }
+        private:
+            std::string image_filename;
+            std::string mask_filename;
+    };
 
 }
 

@@ -7,6 +7,7 @@ Dataset::Dataset(const Object_Type& type, const std::string& folderpath)
     if(this->folderpath == "") return;
 
     this->load_items(folderpath);
+    this->load_models(folderpath);
 }
 
 const size_t Dataset::load_items(const std::string& folderpath){
@@ -50,8 +51,76 @@ const size_t Dataset::load_items(const std::string& folderpath){
     return this->items.size();
 }
 
+const size_t Dataset::load_models(const std::string& folderpath){
+    this->models.clear();
+
+    std::vector<std::string> folders = Utils::Directory::get_folder_filenames(folderpath);
+    
+    std::vector<std::string>::iterator models_folder = folders.end();
+
+    for(std::vector<std::string>::iterator it=folders.begin(); it != folders.end(); ++it){
+        std::vector<std::string> tokens;
+        const size_t n_t = Utils::String::split_string(*it, tokens, '/');   //splits folderpath into directories tokens
+
+        if(models_folder == folders.end()) models_folder = tokens[n_t-1].compare("models")==0 ? it : folders.end();  //if last directory == "labels" stores current folderpath (complete) in label_folder
+
+    }
+    
+    if(models_folder == folders.end()) throw CustomErrors::MissingDirectoryError(folderpath, "MISSING DIRECTORY, DATASET IS MALFORMED");
+
+    //splits model folder's files into 2 vectors: one contains 3 channel images' filenames, the other contains 1 channel masks' filenames
+    std::vector<std::string> images_filenames;
+    std::vector<std::string> masks_filenames;
+    load_models_filenames(*models_folder, images_filenames, masks_filenames);
+    
+    for(auto it = masks_filenames.begin(); it != masks_filenames.end(); ++it){
+        std::cout << *it << std::endl;
+    }
+    std::cout << images_filenames.size() << " " << masks_filenames.size() << std::endl;
+
+    if(images_filenames.size() != masks_filenames.size()) throw CustomErrors::ImageMaskMismatch("","", "IMAGES AND MASKS ARE NOT THE SAME NUMBER");
+
+    std::vector<std::string>::iterator it_i = images_filenames.begin();
+    for(std::vector<std::string>::iterator it_l = masks_filenames.begin(); it_l != masks_filenames.end(); ++it_l){
+
+        std::string image_filename = it_i->substr(it_i->find_last_of("/")+1);
+        std::string image_file_basename = image_filename.substr(0, image_filename.find_first_of('.'));
+        std::string mask_filename = it_i->substr(it_i->find_last_of("/")+1);
+        std::string mask_file_basename = mask_filename.substr(0, mask_filename.find_first_of('.'));
+
+        std::cout << image_file_basename << " " << mask_file_basename << std::endl;
+
+        //if the 2 row filenames are the same -> the pair of label-image is correct
+        if(image_file_basename.compare(mask_file_basename) == 0){
+            //filenames match, load label and store image filename in vector of items
+            this->models.push_back(std::pair<std::string, std::string>(*it_l, *it_i));
+        }
+        else throw CustomErrors::ImageLabelMismatch((*it_i),(*it_l), "IMAGE FILENAME AND LABEL FILENAME MISMATCH");
+        ++it_i;
+    }
+
+    return 0;
+}
+
+const size_t Dataset::load_models_filenames(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames){
+    images_filenames.clear();
+    masks_filenames.clear();
+
+    std::vector<std::string> filenames = Utils::Directory::get_folder_filenames(folderpath);
+
+    for(auto it=filenames.begin(); it != filenames.end(); ++it){
+        std::string filename = it->substr(it->find_last_of("/")+1);
+        std::string file_basename = filename.substr(0, filename.find_first_of('.'));
+
+        if(file_basename.find("mask") != std::string::npos) masks_filenames.push_back(*it);
+        else if(file_basename.find("color") != std::string::npos) images_filenames.push_back(*it);
+        else throw CustomErrors::FileNameError(*it, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
+    }
+    return images_filenames.size();
+}
+
 std::ostream& operator<<(std::ostream& os, const Dataset& d){
-    os << d.get_folderpath() <<" type: " << d.get_type() << " #items: " << d.get_items().size();
+    os << d.get_folderpath() <<" type: " << d.get_type() << " #test items: " << d.get_items().size() << " #models " << d.get_models().size();
     return os;
 }
 
@@ -65,6 +134,12 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Label>& v){
     for(auto it = v.begin(); it != v.end(); ++it){
         os << "\t" << *it << std::endl;
     }
+
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const std::pair<std::string, std::string>& p){
+    os << "image file path: \n\t" << p.first << "\nmask file path:\n" << p.second;
 
     return os;
 }

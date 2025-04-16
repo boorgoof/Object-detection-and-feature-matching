@@ -42,6 +42,9 @@ int main(int argc, const char* argv[]){
 std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path){
     std::vector<std::string> dataset_subfolders = Utils::Directory::get_folder_filenames(dataset_path);
 
+    //REMOVING sugar box SUBFOLDER
+    //dataset_subfolders.erase(dataset_subfolders.begin());
+
     std::map<Object_Type, Dataset> datasets;
 
     for(auto it=dataset_subfolders.begin(); it != dataset_subfolders.end(); ++it){
@@ -57,6 +60,11 @@ std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path){
         auto items = it->second.get_items();
         for(auto it2 = items.begin(); it2 != items.end(); ++it2){
             std::cout << "item: \n" <<  *it2 << std::endl;
+        }
+
+        auto models = it->second.get_models();
+        for(auto it2 = models.begin(); it2 != models.end(); ++it2){
+            std::cout << "model: \n" << *it2 << std::endl;
         }
     }
 
