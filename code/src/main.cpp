@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "../include/Utils.h"
+#include "../include/Dataset.h"
 
 int main(int argc, const char* argv[]){
     std::string path("../dataset/004_sugar_box");
@@ -12,6 +13,16 @@ int main(int argc, const char* argv[]){
     std::string final_imgs_path = path+"/"+images_folder;
     std::string final_lbls_path = path+"/"+label_folder;
 
+    Dataset sugarbox_dataset(Object_Type("004_sugar_box"), path);
+    std::cout << sugarbox_dataset << std::endl;
+
+    auto items = sugarbox_dataset.get_items();
+
+    for(auto it = items.begin(); it != items.end(); ++it){
+        std::cout << "item: \n" <<  (*it) << std::endl;
+    }
+
+    /*
     std::vector<cv::Mat> images, masks;
 
     size_t len = Utils::Loader::load_folder_images(final_imgs_path, images, masks);
@@ -23,6 +34,7 @@ int main(int argc, const char* argv[]){
         }
         std::cout << std::endl;
     }
+        */
 }
 
 
