@@ -22,6 +22,7 @@ namespace Utils{
 
     namespace String{
         const size_t split_string(const std::string& str, std::vector<std::string>& tokens, char delimiter);
+        const std::string get_file_raw_basename(const std::string& filepath, char delimiter);
     }
 
     //https://stackoverflow.com/questions/54398336/stl-type-for-mapping-one-to-one-relations

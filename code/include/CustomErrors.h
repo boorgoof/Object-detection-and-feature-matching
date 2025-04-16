@@ -25,13 +25,13 @@ namespace CustomErrors {
     };
 
     class LabelFormatError : public std::runtime_error {
-        public:
-            LabelFormatError(const std::string& filename, const std::string& message)
-                    : std::runtime_error(message), filename_(filename) {}
-            const std::string& getFilename() const { return filename_; }
-        private:
-            std::string filename_;
-        };
+    public:
+        LabelFormatError(const std::string& filename, const std::string& message)
+                : std::runtime_error(message), filename_(filename) {}
+        const std::string& getFilename() const { return filename_; }
+    private:
+        std::string filename_;
+    };
 
     class InputDirectoryError : public std::runtime_error {
     public:
@@ -58,7 +58,27 @@ namespace CustomErrors {
         const std::string& getDirectory() const { return directory_; }
     private:
         std::string directory_;
-};
+    };
+
+    class MissingDirectoryError : public std::runtime_error {
+    public:
+        MissingDirectoryError(const std::string& directory, const std::string& message)
+            : std::runtime_error(message), directory_(directory) {}
+        const std::string& getDirectory() const { return directory_; }
+    private:
+        std::string directory_;
+    };
+
+    class ImageLabelMismatch : public std::runtime_error {
+        public:
+        ImageLabelMismatch(const std::string& image_filename, const std::string& label_filename, const std::string& message)
+                : std::runtime_error(message), image_filename(image_filename), label_filename{label_filename} {}
+            const std::string& getImageFilename() const { return image_filename; }
+            const std::string& getLabelFilename() const { return label_filename; }
+        private:
+            std::string image_filename;
+            std::string label_filename;
+        };
 
 }
 
