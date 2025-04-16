@@ -42,6 +42,23 @@ std::vector<std::string> Utils::Directory::get_folder_filenames(const std::strin
     return filenames;
 }
 
+const size_t Utils::Directory::split_model_img_masks(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames){
+    images_filenames.clear();
+    masks_filenames.clear();
+
+    std::vector<std::string> filenames = Utils::Directory::get_folder_filenames(folderpath);
+
+    for(auto it=filenames.begin(); it != filenames.end(); ++it){
+        std::string filename = it->substr(it->find_last_of("/")+1);
+        std::string file_basename = filename.substr(0, filename.find_first_of('.'));
+
+        if(file_basename.find("mask") != std::string::npos) masks_filenames.push_back(*it);
+        else if(file_basename.find("color") != std::string::npos) images_filenames.push_back(*it);
+        else throw CustomErrors::FileNameError(*it, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
+    }
+    return images_filenames.size();
+}
+
 cv::Mat Utils::Loader::load_image(const std::string& filepath) {
     cv::Mat img = cv::imread(filepath);
     if(img.empty()) throw CustomErrors::ImageLoadError(filepath,"COULD NOT OPEN FILE");

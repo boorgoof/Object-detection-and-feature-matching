@@ -71,7 +71,7 @@ const size_t Dataset::load_models(const std::string& folderpath){
     //splits model folder's files into 2 vectors: one contains 3 channel images' filenames, the other contains 1 channel masks' filenames
     std::vector<std::string> images_filenames;
     std::vector<std::string> masks_filenames;
-    load_models_filenames(*models_folder, images_filenames, masks_filenames);
+    Utils::Directory::split_model_img_masks(*models_folder, images_filenames, masks_filenames);
     
     for(auto it = masks_filenames.begin(); it != masks_filenames.end(); ++it){
         std::cout << *it << std::endl;
@@ -100,23 +100,6 @@ const size_t Dataset::load_models(const std::string& folderpath){
     }
 
     return 0;
-}
-
-const size_t Dataset::load_models_filenames(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames){
-    images_filenames.clear();
-    masks_filenames.clear();
-
-    std::vector<std::string> filenames = Utils::Directory::get_folder_filenames(folderpath);
-
-    for(auto it=filenames.begin(); it != filenames.end(); ++it){
-        std::string filename = it->substr(it->find_last_of("/")+1);
-        std::string file_basename = filename.substr(0, filename.find_first_of('.'));
-
-        if(file_basename.find("mask") != std::string::npos) masks_filenames.push_back(*it);
-        else if(file_basename.find("color") != std::string::npos) images_filenames.push_back(*it);
-        else throw CustomErrors::FileNameError(*it, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
-    }
-    return images_filenames.size();
 }
 
 std::ostream& operator<<(std::ostream& os, const Dataset& d){

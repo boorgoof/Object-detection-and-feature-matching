@@ -18,6 +18,7 @@ namespace Utils{
 
     namespace Directory{
         std::vector<std::string> get_folder_filenames(const std::string& folderpath);
+        const size_t split_model_img_masks(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames);
     }
 
     namespace String{
