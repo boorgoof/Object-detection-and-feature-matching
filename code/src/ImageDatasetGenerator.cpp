@@ -1,7 +1,7 @@
 #include "../include/ImageDatasetGenerator.h"
 #include "../include/CustomErrors.h"
 
-void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage, const std::string& inputMask, const std::string& outputFolder, int numImages, bool genLightVariations, int numLightVariations) {
+void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage, const std::string& inputMask, const std::string& outputFolder, int numImages, bool genLightVariations = false, int numLightVariations = 0) {
     namespace fs = std::filesystem;
     double angleStep = 360.0 / numImages;
 
@@ -27,6 +27,7 @@ void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage,
         cv::Mat outputImm, outputMask;
         cv::warpAffine(imm, outputImm, rotMat, imm.size());
         cv::warpAffine(mask, outputMask, rotMat, mask.size());
+        
         std::string outputImmname = inputPathImage.stem().string() + "_rot_" + std::to_string(static_cast<int>(angle)) + inputPathImage.extension().string();
         cv::imwrite((fs::path(outputFolder) / outputImmname).string(), outputImm);
 
