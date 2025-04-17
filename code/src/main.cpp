@@ -20,7 +20,9 @@ int main(int argc, const char* argv[]){
         std::cout << "NO COMMAND LINE PARAMETERS, USING DEFAULT" << std::endl;
     }
 
-    //loads datasets' test images and labels, NO MODEL FOLDER
+    //loads datasets' models (feature images), test images and corresponding labels
+    //COLORED FEATURE IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH THE CORRESPONDING MASK FILE PAHT
+    //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = load_datasets(dataset_path);
     
 

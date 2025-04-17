@@ -33,7 +33,7 @@ const std::string Utils::Directory::get_file_basename(const std::string& filepat
 const std::string Utils::Directory::remove_file_suffix(const std::string& file_basename, char delimiter){
     return file_basename.substr(0, file_basename.find_last_of(delimiter));
 }
-
+//get all file names in specified folder (gets also subfolders), sorts the output vector alphabetically ascending
 std::vector<std::string> Utils::Directory::get_folder_filenames(const std::string& folderpath){
     std::vector<std::string> filenames;
     for (const auto & entry : std::filesystem::directory_iterator(folderpath)) {
@@ -41,6 +41,8 @@ std::vector<std::string> Utils::Directory::get_folder_filenames(const std::strin
     }
 
     if(filenames.size() == 0) throw CustomErrors::EmptyFolderError(folderpath, "NO FILES IN FOLDER");
+
+    std::sort(filenames.begin(), filenames.end());
 
     return filenames;
 }
@@ -59,6 +61,10 @@ const size_t Utils::Directory::split_model_img_masks(const std::string& folderpa
         else if(file_basename.find("color") != std::string::npos) images_filenames.push_back(*it);
         else throw CustomErrors::FileNameError(*it, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
     }
+
+    std::sort(images_filenames.begin(), images_filenames.end());
+    std::sort(masks_filenames.begin(), masks_filenames.end());
+
     return images_filenames.size();
 }
 
@@ -100,7 +106,7 @@ std::vector<Label> Utils::Loader::load_label_file(const std::string& filepath){
 
     return labels;
 }
-//loads image folder separating colored images from masks
+//loads image folder separating colored images from masks, sorts the 2 output vectors alphabetically ascending
 const size_t Utils::Loader::load_folder_images(const std::string& folderpath, std::vector<cv::Mat>& output_images, std::vector<cv::Mat>& output_masks){
     output_images.clear();
     output_masks.clear();

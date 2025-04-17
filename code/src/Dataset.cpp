@@ -127,7 +127,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Label>& v){
 }
 
 std::ostream& operator<<(std::ostream& os, const std::pair<std::string, std::string>& p){
-    os << "image file path: \n\t" << p.first << "\nmask file path:\n" << p.second;
+    os << "image file path: \n\t" << p.first << "\nmask file path:\n\t" << p.second;
 
     return os;
 }
