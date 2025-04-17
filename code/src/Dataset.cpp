@@ -6,12 +6,12 @@ Dataset::Dataset(const Object_Type& type, const std::string& folderpath)
     : type{type}, folderpath{folderpath} {
     if(this->folderpath == "") return;
 
-    this->load_items(folderpath);
+    this->load_test_items(folderpath);
     this->load_models(folderpath);
 }
 
-const size_t Dataset::load_items(const std::string& folderpath){
-    this->items.clear();
+const size_t Dataset::load_test_items(const std::string& folderpath){
+    this->test_items.clear();
 
     std::vector<std::string> folders = Utils::Directory::get_folder_filenames(folderpath);
     
@@ -47,13 +47,13 @@ const size_t Dataset::load_items(const std::string& folderpath){
         //if the 2 row filenames are the same -> the pair of label-image is correct
         if(test_image_file_name_raw.compare(label_file_name_raw) == 0){
             //filenames match, load label and store image filename in vector of items
-            this->items.push_back(std::pair<std::vector<Label>, std::string>(Utils::Loader::load_label_file((*it_l)), *it_i));
+            this->test_items.push_back(std::pair<std::vector<Label>, std::string>(Utils::Loader::load_label_file((*it_l)), *it_i));
         }
         else throw CustomErrors::ImageLabelMismatch((*it_i),(*it_l), "IMAGE FILENAME AND LABEL FILENAME MISMATCH");
         ++it_i;
     }
 
-    return this->items.size();
+    return this->test_items.size();
 }
 
 const size_t Dataset::load_models(const std::string& folderpath){

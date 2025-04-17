@@ -1,7 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
-#include <opencv2/xfeatures2d.hpp>
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/CompositeObjectDetector.h"
@@ -29,7 +28,7 @@ int main(int argc, const char* argv[]){
     //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = load_datasets(dataset_path);
     
-    std::unique_ptr<ObjectDetector> object_detector(new CompositeObjectDetector(cv::xfeatures2d::SIFT::create(), cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED)));
+    std::unique_ptr<ObjectDetector> object_detector(new CompositeObjectDetector(cv::SIFT::create(), cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED)));
 
     for(auto it=datasets.begin(); it != datasets.end(); ++it){
         std::vector<std::vector<Label>> output_labels;
