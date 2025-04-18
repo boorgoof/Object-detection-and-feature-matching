@@ -1,6 +1,6 @@
 #include <opencv2/opencv.hpp>
-#include "Label.h"
-#include "Dataset.h"
+#include "../Label.h"
+#include "../Dataset.h"
 
 class ObjectDetector{
     public:
@@ -11,6 +11,6 @@ class ObjectDetector{
     ObjectDetector& operator=(ObjectDetector&&) = delete;
     virtual ~ObjectDetector() = 0;
 
-    virtual const size_t detect_objects(const cv::Mat& src_img, std::vector<Label> out_labels) = 0;
+    virtual const size_t detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) = 0;
     const size_t detect_object_whole_dataset(const Dataset& dataset, std::vector<std::vector<Label>>& out_labels);
 };

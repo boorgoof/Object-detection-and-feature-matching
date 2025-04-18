@@ -1,9 +1,10 @@
-#include "../include/ObjectDetector.h"
-#include "../include/Utils.h"
+#include "../../include/ObjectDetector/ObjectDetector.h"
+#include "../../include/Utils.h"
 
 ObjectDetector::~ObjectDetector() {}
 
 const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset, std::vector<std::vector<Label>>& out_labels){
+    
     out_labels.clear();
     
     const std::vector<std::pair<std::vector<Label>, std::string>>& test_data = dataset.get_items();
