@@ -98,7 +98,7 @@ const size_t Dataset::load_models(const std::string& folderpath){
         //if the 2 row filenames are the same -> the pair of label-image is correct
         if(image_file_basename.compare(mask_file_basename) == 0){
             //filenames match, load label and store image filename in vector of items
-            this->models.push_back(std::pair<std::string, std::string>(*it_l, *it_i));
+            this->models.push_back(std::pair<std::string, std::string>(*it_i, *it_l));
         }
         else throw CustomErrors::ImageLabelMismatch((*it_i),(*it_l), "IMAGE FILENAME AND LABEL FILENAME MISMATCH");
         ++it_i;

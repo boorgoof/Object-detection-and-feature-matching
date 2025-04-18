@@ -16,16 +16,26 @@ const size_t FeaturePipeline::detect_objects(const cv::Mat& src_img, Object_Type
     std::vector<cv::KeyPoint> src_keypoints;
     cv::Mat src_desc;
     this->detectFeatures(src_img,  cv::Mat(),  src_keypoints, src_desc); // in teoria con cv::Mat() non applica una maschera
+    //ritorna i keypoints e i descrittori dell'immagine di input
+
+    //feature matching passando keypoints e descrittori
 
     std::pair<ModelFeatures, std::vector<cv::DMatch>> bestModel = selectBestModel(src_desc);
   
+    ;
+    //-- Draw matches
+    //cv::Mat img_matches;
+    //cv::drawMatches(src_img, src_keypoints, bestModel.first.image, bestModel.first.keypoints, bestModel.second, img_matches );
+    //cv::imshow("Matches", img_matches);
+    //cv::waitKey(0);
+
     out_labels.push_back(this->findBoundingBox(bestModel.second, 
         src_keypoints, 
         bestModel.first.keypoints, 
         bestModel.first.image,
         bestModel.first.mask,
         src_img,
-        object_type)); 
+        object_type));
 
     return 0;
 }
@@ -35,9 +45,10 @@ std::pair<ModelFeatures, std::vector<cv::DMatch>> FeaturePipeline::selectBestMod
     
     int best_model_idx = 0;
     int best_score = 0;
-    std::vector<cv::DMatch> best_matches;
+    std::vector<cv::DMatch> good_matches;
 
     for (size_t i = 0; i < models_features.size(); ++i) {
+        good_matches.clear();
 
         const auto& model = models_features[i];
         if (model.descriptors.empty()) 
@@ -45,26 +56,34 @@ std::pair<ModelFeatures, std::vector<cv::DMatch>> FeaturePipeline::selectBestMod
 
         std::vector<cv::DMatch> matches;
         this->matchFeatures(query_descriptors, model.descriptors, matches);
-                
+        
         std::sort(matches.begin(), matches.end(), [](const cv::DMatch& a, const cv::DMatch& b) {return a.distance < b.distance;});
 
-        std::vector<cv::DMatch> good_matches;
+        
         for (size_t j = 0; j < matches.size(); ++j) {
-            if (matches[j].distance < 1000000.0f) {
+            //std::cout << matches[j].distance << std::endl;
+            if (matches[j].distance < 130.0f) {
                 good_matches.push_back(matches[j]);
             }
         }
+        //std::cout << good_matches.size() << std::endl;
 
-        float score = static_cast<float>(good_matches.size());
+        int score = good_matches.size();
 
         if (score > best_score) {
+            //std::cout << "changing score and index" << std::endl;
             best_score = score;
             best_model_idx = i;
+            //std::cout << "best model index: " << best_model_idx << std::endl;
+            //std::cout << "best score: " << best_score << std::endl;
         }
-
+        //std::cout << "i: " << i << std::endl;
     }
+    std::cout << best_model_idx << std::endl;
+    std::cout << best_score << std::endl;
 
-    return { models_features[best_model_idx], best_matches };
+
+    return { models_features[best_model_idx], good_matches };
 }
 
 
@@ -74,7 +93,7 @@ void FeaturePipeline::setModelsfeatures(const Dataset dataset) {
 
     for (const auto& model_pair : model_pairs) {
 
-        cv::Mat img = cv::imread(model_pair.first, cv::IMREAD_GRAYSCALE);
+        cv::Mat img = cv::imread(model_pair.first, cv::IMREAD_COLOR);
         cv::Mat mask = cv::imread(model_pair.second, cv::IMREAD_GRAYSCALE);
 
         if (img.empty() || mask.empty()){
@@ -109,11 +128,13 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const cv::Mat& imgQuery,
     Object_Type object_type) const 
 {
-    const int minMaches= 10;
+    const int minMatches= 10;
 
-    if (matches.size() < minMaches) {
-        std::cerr << "not enough matches " << matches.size() << ". Min: " << minMaches << std::endl;
-        return Label(object_type, cv::Rect()); 
+    std::cout << "matches: " << matches.size() << std::endl;
+
+    if (matches.size() < minMatches) {
+        std::cerr << "not enough matches " << matches.size() << ". Min: " << minMatches << std::endl;
+        return Label(object_type, cv::Rect());
     }
 
     std::vector<cv::Point2f> query_pts, model_pts;
@@ -123,29 +144,30 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         model_pts.push_back(model_keypoint[match.trainIdx].pt);
     }
 
+    //cv::Mat mask;
+    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0);
+    if (H.empty())
+        return Label(object_type, cv::Rect());      //throw error and catch it
 
-   cv::Mat mask, H = cv::findHomography(imgModel, imgQuery, cv::RANSAC, 5.0, mask);
-   if (H.empty())
-       return Label(object_type, cv::Rect());
+    cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo di dei pixel che non sono zero
 
-   cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo di dei pixel che non sono zero
+    std::vector<cv::Point2f> model_corners = {
 
-   std::vector<cv::Point2f> model_corners = {
+        {(model_rect.x), (model_rect.y)},
+        {(model_rect.x + model_rect.width), (model_rect.y)},
+        {(model_rect.x + model_rect.width), (model_rect.y + model_rect.height)},
+        {(model_rect.x), (model_rect.y + model_rect.height)}
 
-        {float(model_rect.x), float(model_rect.y)},
-        {float(model_rect.x + model_rect.width), float(model_rect.y)},
-        {float(model_rect.x + model_rect.width), float(model_rect.y + model_rect.height)},
-        {float(model_rect.x),(model_rect.y + model_rect.height)}
+    };
 
-   };
+    std::vector<cv::Point2f> scene_corners;
+    cv::perspectiveTransform(model_corners, scene_corners, H);
 
-   std::vector<cv::Point2f> scene_corners;
-   cv::perspectiveTransform(model_corners, scene_corners, H);
-
-   cv::Rect boundingBox = cv::boundingRect(scene_corners);
-   cv::rectangle(imgQuery, boundingBox, cv::Scalar(0,255,0), 2); // Disegna un rettangolo
-
-   return Label(object_type, boundingBox);
+    cv::Rect boundingBox = cv::boundingRect(scene_corners);
+    cv::rectangle(imgQuery, boundingBox, cv::Scalar(0,255,0), 2); // Disegna un rettangolo
+    cv::imshow("imgQuery", imgQuery);
+    cv::waitKey(0);
+    return Label(object_type, boundingBox);
 }
 
 

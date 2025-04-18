@@ -47,7 +47,7 @@ int main(int argc, const char* argv[]){
 
         std::vector<std::vector<Label>> output_labels;
         pipeline->detect_object_whole_dataset(ds, output_labels);
-        
+        break;
     }
 
     /*

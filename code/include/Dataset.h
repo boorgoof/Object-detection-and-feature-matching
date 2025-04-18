@@ -11,7 +11,7 @@ class Dataset{
     Object_Type type;   //object type of the dataset, assuming to create one dataset for every object type (sugar box, mustard, power drill)
     std::string folderpath;     //folder where the physical files are located (to check if another dataset is the copy of this one)
     std::vector<std::pair<std::vector<Label>, std::string>> test_items;   //vector of pairs of labels and image filepath (one image can have more labels since more than one object can appear)
-    std::vector<std::pair<std::string, std::string>> models;
+    std::vector<std::pair<std::string, std::string>> models; //pair of IMAGE COLOR - MASK
 
     const size_t load_models_filenames(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames);
 
