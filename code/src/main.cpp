@@ -29,20 +29,42 @@ int main(int argc, const char* argv[]){
     std::map<Object_Type, Dataset> datasets = load_datasets(dataset_path);
     
     std::unique_ptr<ObjectDetector> object_detector(new FeaturePipeline(cv::SIFT::create(), cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED)));
+    
 
-    for(auto it=datasets.begin(); it != datasets.end(); ++it){
-        std::vector<std::vector<Label>> output_labels;
-        object_detector->detect_object_whole_dataset(it->second, output_labels);
+    FeaturePipeline* pipeline = dynamic_cast<FeaturePipeline*>(object_detector.get());
 
-        //analyze detection accuracy etc etc
-
+    if (!pipeline) {
+        std::cerr << "Error: not a FeaturePipeline\n";
+        return -1;
     }
+
+    for (auto& obj_dataset : datasets) {
+
+        const Object_Type& type = obj_dataset.first;
+        Dataset& ds = obj_dataset.second;
+
+        pipeline->setModelsfeatures(ds);
+
+        std::vector<std::vector<Label>> output_labels;
+        pipeline->detect_object_whole_dataset(ds, output_labels);
+        
+    }
+
+    /*
+    PRIMA
+        for(auto it=datasets.begin(); it != datasets.end(); ++it){
+            std::vector<std::vector<Label>> output_labels;
+            object_detector->detect_object_whole_dataset(it->second, output_labels);
+        }
+
+    */
 
     
     
 }
 
 std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path){
+    
     std::vector<std::string> dataset_subfolders = Utils::Directory::get_folder_filenames(dataset_path);
 
     //REMOVING sugar box SUBFOLDER
@@ -51,9 +73,11 @@ std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path){
     std::map<Object_Type, Dataset> datasets;
 
     for(auto it=dataset_subfolders.begin(); it != dataset_subfolders.end(); ++it){
+        
         std::vector<std::string> tokens;
         const size_t n_f = Utils::String::split_string(*it, tokens, '/');
         datasets.insert(std::pair<Object_Type, Dataset>((tokens[n_f-1]), Dataset(Object_Type(tokens[n_f-1]), *it)));
+        
     }
 
     /* PRINT JUST TO CHECK IF DATASET IS LOADED CORRECTLY

@@ -13,7 +13,7 @@ const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset,
         const cv::Mat img = Utils::Loader::load_image(it->second);
 
         std::vector<Label> img_detections;
-        this->detect_objects(img, img_detections);
+        this->detect_objects(img, dataset.get_type(),  img_detections);
 
         out_labels.push_back(img_detections);
     }
