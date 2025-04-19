@@ -6,7 +6,7 @@
 #include <iostream>
 #include "../include/CustomErrors.h"
 
-//https://stackoverflow.com/questions/5888022/split-string-by-single-spaces
+
 const size_t Utils::String::split_string(const std::string& str, std::vector<std::string>& tokens, char delimiter){
     size_t pos = str.find( delimiter );
     size_t initialPos = 0;
@@ -19,29 +19,30 @@ const size_t Utils::String::split_string(const std::string& str, std::vector<std
         pos = str.find( delimiter, initialPos );
     }
 
-    // Add the last one
     tokens.push_back( str.substr( initialPos, std::min( pos, str.size() ) - initialPos + 1 ) );
 
     return tokens.size();
 }
 
 const std::string Utils::Directory::get_file_basename(const std::string& filepath){
+    //gets the file name from the full path
     std::string filename = filepath.substr(filepath.find_last_of("/")+1);
+    //removes the file extension
     return filename.substr(0, filename.find_first_of('.'));
 }
 
 const std::string Utils::Directory::remove_file_suffix(const std::string& file_basename, char delimiter){
     return file_basename.substr(0, file_basename.find_last_of(delimiter));
 }
-//get all file names in specified folder (gets also subfolders), sorts the output vector alphabetically ascending
 std::vector<std::string> Utils::Directory::get_folder_filenames(const std::string& folderpath){
     std::vector<std::string> filenames;
+    //gets all the files names in the specified folder (also subfolders)
     for (const auto & entry : std::filesystem::directory_iterator(folderpath)) {
         filenames.push_back(entry.path());
     }
 
     if(filenames.size() == 0) throw CustomErrors::EmptyFolderError(folderpath, "NO FILES IN FOLDER");
-
+    //sorts the filenames alphabetically ascending
     std::sort(filenames.begin(), filenames.end());
 
     return filenames;
@@ -50,13 +51,13 @@ std::vector<std::string> Utils::Directory::get_folder_filenames(const std::strin
 const size_t Utils::Directory::split_model_img_masks(const std::string& folderpath, std::vector<std::string>& images_filenames, std::vector<std::string>& masks_filenames){
     images_filenames.clear();
     masks_filenames.clear();
-
+    //gets all the files names in the specified folder (assuming they are all files)
     std::vector<std::string> filenames = Utils::Directory::get_folder_filenames(folderpath);
 
     for(auto it=filenames.begin(); it != filenames.end(); ++it){
-        std::string filename = it->substr(it->find_last_of("/")+1);
-        std::string file_basename = filename.substr(0, filename.find_first_of('.'));
+        std::string file_basename = Utils::Directory::get_file_basename(*it);
 
+        //matches the output array with the file suffix
         if(file_basename.find("mask") != std::string::npos) masks_filenames.push_back(*it);
         else if(file_basename.find("color") != std::string::npos) images_filenames.push_back(*it);
         else throw CustomErrors::FileNameError(*it, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
@@ -72,16 +73,16 @@ cv::Mat Utils::Loader::load_image(const std::string& filepath) {
     cv::Mat img = cv::imread(filepath);
     if(img.empty()) throw CustomErrors::ImageLoadError(filepath,"COULD NOT OPEN FILE");
 
-    std::string filename = filepath.substr(filepath.find_last_of("/")+1);
-    std::string base_filename = filename.substr(0, filename.find_first_of('.'));
+    std::string base_filename = Utils::Directory::get_file_basename(filepath);
 
+    //checks if the file name contains "mask" or "color" to determine if it is a mask or a colored image and loads it accordingly
     if(base_filename.find("mask") != std::string::npos){
         img = cv::imread(filepath, cv::IMREAD_GRAYSCALE);
     }
     else if(base_filename.find("color") != std::string::npos){
         img = cv::imread(filepath, cv::IMREAD_COLOR);
     }
-    else throw CustomErrors::FileNameError(filename, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
+    else throw CustomErrors::FileNameError(base_filename, "FILE HAS TO END WITH mask OR color TO BE A SUITABLE IMAGE");
 
     return img;
 }
@@ -96,6 +97,8 @@ std::vector<Label> Utils::Loader::load_label_file(const std::string& filepath){
             size_t n = Utils::String::split_string(line, tokens, ' ');
 
             if(n!=5) throw CustomErrors::LabelFormatError(line,"LABEL FILE LINE DOES NOT MATCH LABEL FORMAT (class_name p1x p1y p2x p2y)");
+
+            //tokens 1 to 4 are the coordinates of the bounding box, token 0 is the object type name
             cv::Point2i p1(std::stoi(tokens[1]), std::stoi(tokens[2]));
             cv::Point2i p2(std::stoi(tokens[3]), std::stoi(tokens[4]));
             labels.push_back(Label(Object_Type(tokens[0]), cv::Rect(p1.x, p1.y, p2.x-p1.x, p2.y-p1.y)));
@@ -106,7 +109,6 @@ std::vector<Label> Utils::Loader::load_label_file(const std::string& filepath){
 
     return labels;
 }
-//loads image folder separating colored images from masks, sorts the 2 output vectors alphabetically ascending
 const size_t Utils::Loader::load_folder_images(const std::string& folderpath, std::vector<cv::Mat>& output_images, std::vector<cv::Mat>& output_masks){
     output_images.clear();
     output_masks.clear();
@@ -116,15 +118,20 @@ const size_t Utils::Loader::load_folder_images(const std::string& folderpath, st
     for(auto it = filenames.begin(); it != filenames.end(); ++it){
         
         cv::Mat img = load_image(*it);
+        //if loaded image has 1 channel, it is a mask, so it is pushed to the masks vector
         if(img.channels()==1){
             output_masks.push_back(img);
         }
-        else output_images.push_back(img);
+        //else it is a colored image, so it is pushed to the images vector
+        else if(img.channels()==3){
+            output_images.push_back(img);
+        }
+        //if the image has more than 3 channels, it is not a valid image, so it is ignored
+        else throw CustomErrors::ImageLoadError(*it,"IMAGE IS NEITHER A MASK NOR A COLORED IMAGE (TOO MANY CHANNELS)");
     }
 
     return output_images.size();
 }
-//loads image folder
 const size_t Utils::Loader::load_folder_images(const std::string& folderpath, std::vector<cv::Mat>& output_images){
     output_images.clear();
 
@@ -136,7 +143,6 @@ const size_t Utils::Loader::load_folder_images(const std::string& folderpath, st
 
     return output_images.size();
 }
-//loads labels in a folder, each element can contain more than one label
 std::vector<std::vector<Label>> Utils::Loader::load_folder_labels(const std::string& folderpath){
     std::vector<std::string> filenames = Utils::Directory::get_folder_filenames(folderpath);
     std::vector<std::vector<Label>> labels;
