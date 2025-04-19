@@ -25,7 +25,7 @@ void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage,
         double angle = i * angleStep;
         cv::Mat rotMat = cv::getRotationMatrix2D(center, angle, 1.0);
         cv::Mat outputImm, outputMask;
-        cv::warpAffine(imm, outputImm, rotMat, imm.size());
+        cv::warpAffine(imm, outputImm, rotMat, imm.size(), cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(255, 255, 255));
         cv::warpAffine(mask, outputMask, rotMat, mask.size());
         
         std::string outputImmname = inputPathImage.stem().string() + "_rot_" + std::to_string(static_cast<int>(angle)) + inputPathImage.extension().string();
