@@ -1,50 +1,39 @@
+#ifndef FEATUREPIPELINE_H
+#define FEATUREPIPELINE_H
+
+
 #include "../ObjectDetector.h"
+#include "FeatureStrategy.h"
 #include <opencv2/opencv.hpp>
 
-struct ModelFeatures {
-    Object_Type obj;
-    std::string fileName;
-    cv::Mat image;
-    cv::Mat mask;
-    std::vector<cv::KeyPoint> keypoints;
-    cv::Mat descriptors;
 
-    ModelFeatures(const Object_Type& objType, const std::string& fileName, 
-                  const cv::Mat& image, const cv::Mat& mask, const std::vector<cv::KeyPoint>& keypoints, 
-                  const cv::Mat& descriptors)
-        : obj(objType), fileName(fileName), image(image), mask(mask), keypoints(keypoints), descriptors(descriptors) {}
-};
+class FeaturePipeline : public ObjectDetector {
 
-class FeaturePipeline : public ObjectDetector{
     private:
-    cv::Ptr<cv::Feature2D> feature_detector;
-    cv::Ptr<cv::DescriptorMatcher> feature_matcher; 
-    std::vector<ModelFeatures> models_features;
-
+        std::unique_ptr<FeatureStrategy> strategy;
+    
     public:
-    FeaturePipeline(cv::Ptr<cv::Feature2D> feature_detector, cv::Ptr<cv::DescriptorMatcher> feature_matcher)
-        : feature_detector{feature_detector}, feature_matcher{feature_matcher} {};
-
-
-    const size_t detect_objects(const cv::Mat& src_img, Object_Type object_type, std::vector<Label>& out_labels) override;
-    std::pair<ModelFeatures, std::vector<cv::DMatch>> selectBestModel(const cv::Mat& query_descriptors) const;
-    Label findBoundingBox(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyPoint>& model_keypoint, const std::vector<cv::KeyPoint>& query_keypoint, const cv::Mat& imgModel,const cv::Mat& maskModel, const cv::Mat& imgQuery, Object_Type object_type) const;
-
-    // extract features from image using cv::Ptr<cv::Feature2D> feature_detector
-    void detectFeatures(const cv::Mat& img, const cv::Mat& mask, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const;
-
-    //match features from image using cv::Ptr<cv::DescriptorMatcher> feature_matcher
-    void matchFeatures(const cv::Mat& queryDescriptors,const cv::Mat& trainDescriptors, std::vector<cv::DMatch>& matches) const;
+        FeaturePipeline(std::unique_ptr<FeatureStrategy>&& strategy) // chiedere bene a matte
+            : strategy(std::move(strategy)) {}
     
+        void setStrategy(std::unique_ptr<FeatureStrategy>&& new_strategy) {
+            strategy = std::move(new_strategy);
+        }
     
-    //setters
-    void setModelsfeatures(const Dataset dataset);
-    void setFeatureDetector(const cv::Ptr<cv::Feature2D>& feature_detector);
-    void setFeatureMatcher(const cv::Ptr<cv::DescriptorMatcher>& feature_matcher);
-    
+        void detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) override ;
+
+        Label findBoundingBox_1(const std::vector<cv::DMatch>& matches,
+            const std::vector<cv::KeyPoint>& query_keypoint,
+            const std::vector<cv::KeyPoint>& model_keypoint,
+            const cv::Mat& imgModel,
+            const cv::Mat& maskModel,
+            const cv::Mat& imgQuery,
+            Object_Type object_type) const;
+
+        
 };
 
-
+#endif // FEATUREPIPELINE_H
   /*
    DA eliminare dopo:
 

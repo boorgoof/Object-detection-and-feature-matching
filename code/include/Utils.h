@@ -120,6 +120,21 @@ namespace Utils{
             return inverseMap;
         }
     }
+
+    /**
+     * @brief Detection accuracy functions.
+     */
+    namespace DetectionAccuracy{
+
+        double calculateIoU(const Label& predictedLabel, const Label& realLabel);
+        double calculateMeanIoU(const std::map<Label, Label>& labelPairs);
+        double calculateAccuracy(const std::map<Label, Label>& labelPairs, double threshold = 0.5);
+
+    };
+
+
+
+
 };
 
 #endif

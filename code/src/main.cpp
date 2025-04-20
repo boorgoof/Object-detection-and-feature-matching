@@ -4,6 +4,8 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
+#include "../include/ObjectDetector/FeaturePipeline/FeatureStrategy.h"
+#include "../include/ObjectDetector/FeaturePipeline/SIFT_FLANN_strategy.h"
 
 
 std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path);
@@ -27,15 +29,14 @@ int main(int argc, const char* argv[]){
     //COLORED FEATURE IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH THE CORRESPONDING MASK FILE PAHT
     //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = load_datasets(dataset_path);
-    
-    std::unique_ptr<ObjectDetector> object_detector(new FeaturePipeline(cv::SIFT::create(), cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED)));
-    
 
+    
+    std::unique_ptr<FeatureStrategy> strategy = std::make_unique<SIFT_FLANN_strategy>();
+    std::unique_ptr<ObjectDetector> object_detector = std::make_unique<FeaturePipeline>(std::move(strategy));
     FeaturePipeline* pipeline = dynamic_cast<FeaturePipeline*>(object_detector.get());
-
+    
     if (!pipeline) {
-        std::cerr << "Error: not a FeaturePipeline\n";
-        return -1;
+        std::cerr << "Cast failed" << std::endl;
     }
 
     for (auto& obj_dataset : datasets) {
@@ -43,24 +44,11 @@ int main(int argc, const char* argv[]){
         const Object_Type& type = obj_dataset.first;
         Dataset& ds = obj_dataset.second;
 
-        pipeline->setModelsfeatures(ds);
-
         std::vector<std::vector<Label>> output_labels;
         pipeline->detect_object_whole_dataset(ds, output_labels);
         break;
     }
 
-    /*
-    PRIMA
-        for(auto it=datasets.begin(); it != datasets.end(); ++it){
-            std::vector<std::vector<Label>> output_labels;
-            object_detector->detect_object_whole_dataset(it->second, output_labels);
-        }
-
-    */
-
-    
-    
 }
 
 std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path){
