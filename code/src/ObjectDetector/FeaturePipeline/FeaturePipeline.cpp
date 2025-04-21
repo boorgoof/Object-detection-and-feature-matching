@@ -31,12 +31,9 @@ void FeaturePipeline::detect_objects_dataset(const std::string& query_img_name, 
         return; 
     }
 
-    // DA ELIMINARE SOTTO 
-    std::cout << "MAtch: " << matches.size() << std::endl;
-
     cv::Mat imgModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].first);
     cv::Mat maskModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].second);
-    Label labelObj = findBoundingBox(matches, query_features.keypoints, model.keypoints, imgModel,  maskModel, query_img, dataset.get_models()[model.dataset_models_idx].first);
+    Label labelObj = findBoundingBox(matches, query_features.keypoints, model.keypoints, imgModel,  maskModel, query_img, dataset.get_type());
     
     out_items[query_img_name].push_back(labelObj);
 }
@@ -77,7 +74,6 @@ Label FeaturePipeline::findBoundingBox(
 
     cv::imshow("Bounding Box on Query Image", img);
     cv::waitKey(0);
-
     return Label(object_type, query_rect);
 }
 

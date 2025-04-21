@@ -18,14 +18,14 @@ struct ModelFeatures {
 };
 
 struct QueryFeatures {
-    int dataset_query_idx;
+
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
 
     QueryFeatures(const int query_idx, const std::vector<cv::KeyPoint>& keypoints, const cv::Mat& descriptors)
-        : dataset_query_idx(query_idx), keypoints(keypoints), descriptors(descriptors) {}
+        : keypoints(keypoints), descriptors(descriptors) {}
 
-    QueryFeatures(): dataset_query_idx(-1), keypoints(), descriptors() {}
+    QueryFeatures():  keypoints(), descriptors() {}
 };
 
 class FeatureStrategy {

@@ -31,7 +31,7 @@ class FeaturePipeline : public ObjectDetector {
             const cv::Mat& imgQuery,
             Object_Type object_type) const;
         
-            /*
+        /*
         Label findBoundingBox_2(const std::vector<cv::DMatch>& matches,
             const std::vector<cv::KeyPoint>& query_keypoint,
             const std::vector<cv::KeyPoint>& model_keypoint,

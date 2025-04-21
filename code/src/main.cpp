@@ -44,8 +44,16 @@ int main(int argc, const char* argv[]){
         const Object_Type& type = obj_dataset.first;
         Dataset& ds = obj_dataset.second;
 
-        std::vector<std::vector<Label>> output_labels;
-        pipeline->detect_object_whole_dataset(ds, output_labels);
+        std::map<std::string, std::vector<Label>> predicted_items; 
+        pipeline->detect_object_whole_dataset(ds, predicted_items);
+
+        std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_items_map();
+        double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);
+        std::cout << "Accuracy for " << obj_dataset.first.to_string() << ": " << accuracy << std::endl;
+
+        double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
+        std::cout << "Mean IoU for " << obj_dataset.first.to_string() << ": " << meanIoU  << std::endl;
+
         break;
     }
 

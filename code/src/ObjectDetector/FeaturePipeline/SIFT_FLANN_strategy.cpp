@@ -9,7 +9,7 @@
 
 */
 
-
+/*
 ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset,  QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const {
     
     std::vector<ModelFeatures> models_features;
@@ -81,15 +81,14 @@ ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& qu
     out_matches = out_matches_2;
     return best_model;
 }
+*/
 
 
-/*
 ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const {
     
     std::vector<ModelFeatures> models_features;
     detectModelsFeatures(dataset,this->features_detector, models_features);
 
-    
     this->features_detector->detectAndCompute(query_img,  cv::noArray(),  query_features.keypoints, query_features.descriptors); 
 
     int best_model_idx = matchBestModel(query_features.descriptors, models_features, out_matches); 
@@ -101,7 +100,7 @@ ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& qu
     return best_model;
 }
 
-*/
+
 
 
 int SIFT_FLANN_strategy::matchBestModel(const cv::Mat& queryDescriptors,  std::vector<ModelFeatures>& models_features, std::vector<cv::DMatch>& out_best_matches) const {

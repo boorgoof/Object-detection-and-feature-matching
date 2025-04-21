@@ -10,18 +10,19 @@
 
 double Utils::DetectionAccuracy::calculateIoU(const Label& predictedLabel, const Label& realLabel) {
     
-    // Calculate the insection area
+    // Insection area
     cv::Rect intersectionRect = predictedLabel.get_bounding_box() & realLabel.get_bounding_box();
     double intersection_area = intersectionRect.area();
 
-    // Calculate the union area
+    // Union area
     double union_area = predictedLabel.get_bounding_box().area() + realLabel.get_bounding_box().area() - intersection_area;
 
+    // IoU
     return intersection_area / union_area;
 }
 
 
-double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>> realItems, const std::map<std::string, std::vector<Label>> predictedItems){
+double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems){
     
     double sum = 0.0;
     int total_predictions = 0;
@@ -64,23 +65,25 @@ double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::ma
 
 
 
-double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>> realItems, const std::map<std::string, std::vector<Label>> predictedItems , double threshold ){
+double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems , double threshold ){
     
     double true_positive = 0.0;
     int total_items = 0;
 
+ 
     for (const auto& item : realItems) {
         
         const std::string& filename = item.first;
         const std::vector<Label>& real_labels = item.second;
 
+        
         // if the file isn't in the predicted map, skip it
         if(predictedItems.find(filename) == predictedItems.end()){
             continue;
         }
 
         const std::vector<Label>& predicted_labels = predictedItems.at(filename);
-
+        
         for (const auto& real_label : real_labels) {
             
             if (real_label.get_class_name().to_string() != obj.to_string()) {
