@@ -16,8 +16,9 @@ class SIFT_FLANN_strategy : public FeatureStrategy {
                                 features_matcher(cv::makePtr<cv::FlannBasedMatcher>(cv::makePtr<cv::flann::KDTreeIndexParams>(5), cv::makePtr<cv::flann::SearchParams>(50) )) {}
 
 
-        ModelFeatures detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, std::vector<cv::DMatch>& out_matches) const override;
+        ModelFeatures detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const override;
         int matchBestModel(const cv::Mat& queryDescriptors, std::vector<ModelFeatures>& models_features, std::vector<cv::DMatch>& out_matches) const;
+        int matchBestModel_2(const cv::Mat& queryDescriptors,  std::vector<ModelFeatures>& models_features, std::vector<cv::DMatch>& out_best_matches) const;
  };
 
 

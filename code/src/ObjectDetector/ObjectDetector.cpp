@@ -10,12 +10,11 @@ const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset,
     const std::vector<std::pair<std::vector<Label>, std::string>>& test_data = dataset.get_items();
 
     for(auto it=test_data.begin(); it != test_data.end(); ++it){
-        const cv::Mat img = Utils::Loader::load_image(it->second);
+        
+        std::map<std::string, std::vector<Label>> predicted_items;
+        this->detect_objects_dataset(it->second, dataset, predicted_items);
 
-        std::vector<Label> img_detections;
-        this->detect_objects(img, dataset, img_detections);
-
-        out_labels.push_back(img_detections);
+        out_labels.push_back(predicted_items[it->second]); // per me si deve cambiare e ritornare std::map<std::string, std::vector<Label>> predicted_items;
     };
 
     return out_labels.size();

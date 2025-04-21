@@ -13,16 +13,26 @@ class FeaturePipeline : public ObjectDetector {
         std::unique_ptr<FeatureStrategy> strategy;
     
     public:
-        FeaturePipeline(std::unique_ptr<FeatureStrategy>&& strategy) // chiedere bene a matte
+        FeaturePipeline(std::unique_ptr<FeatureStrategy>&& strategy) // chiedere bene a matte il &&
             : strategy(std::move(strategy)) {}
     
         void setStrategy(std::unique_ptr<FeatureStrategy>&& new_strategy) {
             strategy = std::move(new_strategy);
         }
     
-        void detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) override ;
+        void detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) override ; // da togliere per me 
+        void detect_objects_dataset(const std::string& query_img_name, const Dataset& dataset, std::map<std::string, std::vector<Label>>& out_items) override ;
 
-        Label findBoundingBox_1(const std::vector<cv::DMatch>& matches,
+        Label findBoundingBox(const std::vector<cv::DMatch>& matches,
+            const std::vector<cv::KeyPoint>& query_keypoint,
+            const std::vector<cv::KeyPoint>& model_keypoint,
+            const cv::Mat& imgModel,
+            const cv::Mat& maskModel,
+            const cv::Mat& imgQuery,
+            Object_Type object_type) const;
+        
+            /*
+        Label findBoundingBox_2(const std::vector<cv::DMatch>& matches,
             const std::vector<cv::KeyPoint>& query_keypoint,
             const std::vector<cv::KeyPoint>& model_keypoint,
             const cv::Mat& imgModel,
@@ -30,7 +40,7 @@ class FeaturePipeline : public ObjectDetector {
             const cv::Mat& imgQuery,
             Object_Type object_type) const;
 
-        
+        */
 };
 
 #endif // FEATUREPIPELINE_H

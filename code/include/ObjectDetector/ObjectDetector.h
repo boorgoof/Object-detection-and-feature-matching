@@ -15,6 +15,7 @@ class ObjectDetector{
     virtual ~ObjectDetector() = 0;
 
     virtual void detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) = 0;
+    virtual void detect_objects_dataset(const std::string& query_img_name, const Dataset& dataset, std::map<std::string, std::vector<Label>>& out_items) = 0;
     const size_t detect_object_whole_dataset(const Dataset& dataset, std::vector<std::vector<Label>>& out_labels);
 };
 

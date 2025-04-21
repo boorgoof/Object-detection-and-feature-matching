@@ -108,6 +108,21 @@ const size_t Dataset::load_models(const std::string& folderpath){
     return 0;
 }
 
+const std::map<std::string, std::vector<Label>> Dataset::get_items_map() const {
+    
+    std::map<std::string, std::vector<Label>> items_map;
+
+    for (const auto& item : this->test_items) {
+        
+        const std::vector<Label>& labels = item.first;
+        const std::string& filename = item.second;
+
+        items_map[filename].insert(items_map[filename].end(), labels.begin(), labels.end());
+    }
+
+    return items_map;
+}
+
 std::ostream& operator<<(std::ostream& os, const Dataset& d){
     os << d.get_folderpath() <<" type: " << d.get_type() << " #test items: " << d.get_items().size() << " #models " << d.get_models().size();
     return os;

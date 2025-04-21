@@ -17,12 +17,22 @@ struct ModelFeatures {
     : dataset_models_idx(-1), keypoints(), descriptors() {}
 };
 
+struct QueryFeatures {
+    int dataset_query_idx;
+    std::vector<cv::KeyPoint> keypoints;
+    cv::Mat descriptors;
+
+    QueryFeatures(const int query_idx, const std::vector<cv::KeyPoint>& keypoints, const cv::Mat& descriptors)
+        : dataset_query_idx(query_idx), keypoints(keypoints), descriptors(descriptors) {}
+
+    QueryFeatures(): dataset_query_idx(-1), keypoints(), descriptors() {}
+};
 
 class FeatureStrategy {
 
     public:
         virtual ~FeatureStrategy() = default;
-        virtual ModelFeatures detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, std::vector<cv::DMatch>& out_matches) const = 0;
+        virtual ModelFeatures detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const = 0;
 
     protected:
 

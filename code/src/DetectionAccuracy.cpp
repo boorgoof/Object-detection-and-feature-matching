@@ -21,59 +21,91 @@ double Utils::DetectionAccuracy::calculateIoU(const Label& predictedLabel, const
 }
 
 
-double Utils::DetectionAccuracy::calculateMeanIoU(const std::map<Label, Label>& labelPairs) {
-    if (labelPairs.empty()) {
-        throw std::invalid_argument("Input map cannot be empty.");
-    }
-
+double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>> realItems, const std::map<std::string, std::vector<Label>> predictedItems){
+    
     double sum = 0.0;
-    int count = 0;
-
-    for (const auto& pair : labelPairs) {
-
-        const Label& predicted = pair.first;
-        const Label& real = pair.second;
-
-        if (predicted.get_class_name().to_string() != real.get_class_name().to_string()) {
-            throw std::invalid_argument("Predicted and real labels must have the same class name.");
-        }
-
-        double iou = calculateIoU(predicted, real);
-        sum += iou;
-        count++;
-    }
-
-    return sum / count;
-}
-
-
-
-double Utils::DetectionAccuracy::calculateAccuracy(const std::map<Label, Label>& labelPairs, double threshold ){
-
-    if (labelPairs.empty()) {
-        throw std::invalid_argument("Input map cannot be empty.");
-    }
-
-    double true_positive = 0.0;
     int total_predictions = 0;
 
-    for (const auto& pair : labelPairs) {
+    for (const auto& item : realItems) {
+        
+        const std::string& filename = item.first;
+        const std::vector<Label>& real_labels = item.second;
 
-        const Label& predictedLabel = pair.first;
-        const Label& realLabel = pair.second;
-
-        if (predictedLabel.get_class_name().to_string() != realLabel.get_class_name().to_string()) {
-            throw std::invalid_argument("Predicted and real labels must have the same class name.");
+        // if the file isn't in the predicted map, skip it
+        if(predictedItems.find(filename) == predictedItems.end()){
+            continue;
         }
 
-        double iou = calculateIoU(predictedLabel, realLabel);
-        if (iou >= threshold ) { 
-            true_positive++;
+        const std::vector<Label>& predicted_labels = predictedItems.at(filename);
+
+        for (const auto& real_label : real_labels) {
+            
+            if (real_label.get_class_name().to_string() != obj.to_string()) {
+                continue;
+            }
+
+            for (const auto& predicted_label : predicted_labels) {
+
+                if (predicted_label.get_class_name().to_string() != obj.to_string()) {
+                    continue;
+                }
+
+                double iou = Utils::DetectionAccuracy::calculateIoU(predicted_label, real_label);
+                sum = sum + iou;
+                total_predictions++;
+
+            }
         }
-        total_predictions++;
+        
     }
 
-    
-    return true_positive / total_predictions;
+    return sum / total_predictions;
 }
+
+
+
+double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>> realItems, const std::map<std::string, std::vector<Label>> predictedItems , double threshold ){
     
+    double true_positive = 0.0;
+    int total_items = 0;
+
+    for (const auto& item : realItems) {
+        
+        const std::string& filename = item.first;
+        const std::vector<Label>& real_labels = item.second;
+
+        // if the file isn't in the predicted map, skip it
+        if(predictedItems.find(filename) == predictedItems.end()){
+            continue;
+        }
+
+        const std::vector<Label>& predicted_labels = predictedItems.at(filename);
+
+        for (const auto& real_label : real_labels) {
+            
+            if (real_label.get_class_name().to_string() != obj.to_string()) {
+                continue;
+            }
+
+            for (const auto& predicted_label : predicted_labels) {
+
+                if (predicted_label.get_class_name().to_string() != obj.to_string()) {
+                    continue;
+                }
+
+                double iou = Utils::DetectionAccuracy::calculateIoU(predicted_label, real_label);
+                if (iou >= threshold) {
+                    true_positive++;
+                }
+                
+            }
+
+            total_items++;
+        }
+        
+    }
+
+    return true_positive / total_items;
+}
+
+

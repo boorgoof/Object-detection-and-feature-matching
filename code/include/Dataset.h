@@ -78,6 +78,8 @@ class Dataset{
      * @return vector of pairs of labels and image filepath.
      */
     const std::vector<std::pair<std::vector<Label>, std::string>>& get_items() const {return this->test_items;}
+
+    const std::map<std::string, std::vector<Label>> get_items_map() const; // TODO
     /**
      * @brief return the models of the dataset.
      * @return vector of pairs of image and mask filepath.
