@@ -1,9 +1,8 @@
-#ifndef FEATURESTRATEGY_H
-#define FEATURESTRATEGY_H
+#ifndef FEATURES_H
+#define FEATURES_H
 
+#include <vector>
 #include <opencv2/opencv.hpp>
-#include "../../Label.h"
-#include "../../Dataset.h"
 
 struct ModelFeatures {
     int dataset_models_idx;
@@ -27,30 +26,5 @@ struct QueryFeatures {
 
     QueryFeatures():  keypoints(), descriptors() {}
 };
-/*
-enum Scope{
-    MODEL,
-    QUERY
-}
 
-Features{
-    std::vector<cv::KeyPoint> keypoints;
-    cv::Mat descriptors;
-    Scope scope;
-
-}*/
-
-class FeatureStrategy {
-
-    public:
-        virtual ~FeatureStrategy() = default;
-        virtual ModelFeatures detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const = 0;
-
-    protected:
-
-        void detectModelsFeatures( const Dataset& dataset, const cv::Ptr<cv::Feature2D>& detector, std::vector<ModelFeatures>&  models_features) const;
-       
-};
-
-
-#endif // FEATURESTRATEGY_H
+#endif

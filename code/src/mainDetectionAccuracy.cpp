@@ -4,8 +4,7 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
-#include "../include/ObjectDetector/FeaturePipeline/FeatureStrategy.h"
-#include "../include/ObjectDetector/FeaturePipeline/SIFT_FLANN_strategy.h"
+
 
 
 std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path);

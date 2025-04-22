@@ -4,8 +4,6 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
-#include "../include/ObjectDetector/FeaturePipeline/FeatureStrategy.h"
-#include "../include/ObjectDetector/FeaturePipeline/SIFT_FLANN_strategy.h"
 
 
 
@@ -29,18 +27,15 @@ int main(int argc, const char* argv[]){
     //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = Utils::Loader::load_datasets(dataset_path);
 
-    
-    std::unique_ptr<FeatureStrategy> strategy = std::make_unique<SIFT_FLANN_strategy>();
-    std::unique_ptr<ObjectDetector> object_detector = std::make_unique<FeaturePipeline>(std::move(strategy));
-    FeaturePipeline* pipeline = dynamic_cast<FeaturePipeline*>(object_detector.get());
-    
-    if (!pipeline) {
-        std::cerr << "Cast failed" << std::endl;
-    }
 
     int i=0;
     for (auto& obj_dataset : datasets) {
-        if (i==0){i++; continue;}
+        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(cv::SIFT::create()), new FeatureMatcher(cv::FlannBasedMatcher::create()), obj_dataset.second);
+        FeaturePipeline* pipeline = dynamic_cast<FeaturePipeline*>(object_detector);
+
+        if (!pipeline) {
+            std::cerr << "Cast failed" << std::endl;
+        }
 
         const Object_Type& type = obj_dataset.first;
         Dataset& ds = obj_dataset.second;
@@ -54,9 +49,6 @@ int main(int argc, const char* argv[]){
 
         double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
         std::cout << "Mean IoU for " << obj_dataset.first.to_string() << ": " << meanIoU  << std::endl;
-
-        //break;
-        i++;
     }
 
 

@@ -3,25 +3,48 @@
 
 
 #include "../ObjectDetector.h"
-#include "FeatureStrategy.h"
+#include "FeatureDetector.h"
+#include "FeatureMatcher.h"
 #include <opencv2/opencv.hpp>
-
+#include "../../Label.h"
+#include "Features.h"
 
 class FeaturePipeline : public ObjectDetector {
 
     private:
-        std::unique_ptr<FeatureStrategy> strategy;
+        std::unique_ptr<FeatureDetector> detector;
+        std::unique_ptr<FeatureMatcher> matcher;
     
+        Dataset& dataset;
+        std::vector<ModelFeatures> models_features;
+
+        void init_models_features() {
+            this->models_features.clear();
+            this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features);
+        }
+
     public:
-        FeaturePipeline(std::unique_ptr<FeatureStrategy>&& strategy) // chiedere bene a matte il &&
-            : strategy(std::move(strategy)) {}
+        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset) // chiedere bene a matte il &&
+            : detector(fd), matcher(fm), dataset{dataset} { this->init_models_features();}
     
-        void setStrategy(std::unique_ptr<FeatureStrategy>&& new_strategy) {
-            strategy = std::move(new_strategy);
+
+        /*void addDetectorComponent(FeatureDetector* fd) {
+            detector.release();
+            detector.
+        }
+        void addMatcherComponent(std::unique_ptr<FeatureMatcher>&& fm) {
+            matcher.release();
+            matcher = std::move(fm);
+        }*/
+
+        void setDataset(Dataset& dataset) {
+            this->dataset = dataset;
+        }
+        const Dataset& getDataset() const {
+            return this->dataset;
         }
     
-        void detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) override ; // da togliere per me 
-        void detect_objects_dataset(const std::string& query_img_name, const Dataset& dataset, std::map<std::string, std::vector<Label>>& out_items) override ;
+        void detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) override;
 
         Label findBoundingBox(const std::vector<cv::DMatch>& matches,
             const std::vector<cv::KeyPoint>& query_keypoint,

@@ -1,52 +1,57 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
 
 
-void FeaturePipeline::detect_objects(const cv::Mat& src_img, const Dataset& dataset, std::vector<Label>& out_labels) {
 
-   
+void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) {
+
+    out_labels.clear();
+
+    //models' features are already detected and stored in the pipeline (they always remain the same for every test image, so they are detected only once)
+
+    //detects test image features
     QueryFeatures query_features;
-    std::vector<cv::DMatch> matches;
-    ModelFeatures model = strategy->detect_and_match_best_model(src_img, dataset, query_features, matches);
+    this->detector->detectFeatures(src_img, query_features.keypoints, query_features.descriptors);
     
-    if(model.dataset_models_idx < 0){
-        std::cout << "detect object: Nessun modello trovato" << std::endl; // eliminare solo il cout
-        return; 
+    //matches test image features with every models' features and store them in out_matches
+    std::vector<std::vector<cv::DMatch>> out_matches;
+    for(ModelFeatures model_features : this->models_features){
+        std::vector<cv::DMatch> out_matches_t;
+        this->matcher->matchFeatures(query_features.descriptors, model_features.descriptors, out_matches_t);
+        out_matches.push_back(out_matches_t);
     }
 
-    cv::Mat imgModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].first);
-    cv::Mat maskModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].second);
-    Label labelObj = findBoundingBox(matches, query_features.keypoints, model.keypoints, imgModel,  maskModel, src_img, dataset.get_models()[model.dataset_models_idx].first);
-     
-}
-
-void FeaturePipeline::detect_objects_dataset(const std::string& query_img_name, const Dataset& dataset, std::map<std::string, std::vector<Label>>& out_items) {
-
-    cv::Mat query_img = Utils::Loader::load_image(query_img_name);
-
-    QueryFeatures query_features;
-    std::vector<cv::DMatch> matches;
-    ModelFeatures model = strategy->detect_and_match_best_model(query_img, dataset, query_features, matches);
-    if(model.dataset_models_idx < 0){
-        std::cout << "detect object: Nessun modello trovato" << std::endl; // eliminare solo il cout
-        return; 
+    //finds the best model (the one with the most matches)
+    int best_model_idx = -1;
+    size_t best_score = 0;
+    for (size_t i = 0; i < out_matches.size(); ++i) {
+        if (out_matches[i].size() > best_score) {
+            best_score = out_matches[i].size();
+            best_model_idx = static_cast<int>(i);
+        }
     }
 
-    cv::Mat imgModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].first);
-    cv::Mat maskModel = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].second);
-    Label labelObj = findBoundingBox(matches, query_features.keypoints, model.keypoints, imgModel,  maskModel, query_img, dataset.get_type());
+    if(best_model_idx == -1){
+        std::cout << "detect object: Nessun modello trovato" << std::endl; // eliminare solo il cout
+        return;
+    }
+    //calculates bounding box of the object found in the test image
+    cv::Mat imgModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].first);
+    cv::Mat maskModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].second);
+    Label labelObj = findBoundingBox(out_matches[best_model_idx], query_features.keypoints, this->models_features[best_model_idx].keypoints, imgModel,  maskModel, src_img, this->dataset.get_type());
     
-    out_items[query_img_name].push_back(labelObj);
+    out_labels.push_back(labelObj);
 }
-
-
+/*
 Label FeaturePipeline::findBoundingBox(
-    const std::vector<cv::DMatch>& matches,
-    const std::vector<cv::KeyPoint>& query_keypoint,
-    const std::vector<cv::KeyPoint>& model_keypoint,
-    const cv::Mat& imgModel,
-    const cv::Mat& maskModel,
-    const cv::Mat& imgQuery,
-    Object_Type object_type) const 
+
+    void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels) {
+    } const std::vector<cv::DMatch> &matches,
+    const std::vector<cv::KeyPoint> &query_keypoint,
+    const std::vector<cv::KeyPoint> &model_keypoint,
+    const cv::Mat &imgModel,
+    const cv::Mat &maskModel,
+    const cv::Mat &imgQuery,
+    Object_Type object_type) const
 {
     const int minMatches = 10;
 
@@ -76,9 +81,9 @@ Label FeaturePipeline::findBoundingBox(
     cv::waitKey(0);
     return Label(object_type, query_rect);
 }
+*/
 
-
-/* METODO OPENCV MA NON VA
+//METODO OPENCV MA NON VA - e invece sì ;)
 Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const std::vector<cv::KeyPoint>& query_keypoint,
     const std::vector<cv::KeyPoint>& model_keypoint,
@@ -128,4 +133,3 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
 
     return Label(object_type, boundingBox);
 }
-*/
