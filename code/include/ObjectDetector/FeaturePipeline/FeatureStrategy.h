@@ -27,6 +27,18 @@ struct QueryFeatures {
 
     QueryFeatures():  keypoints(), descriptors() {}
 };
+/*
+enum Scope{
+    MODEL,
+    QUERY
+}
+
+Features{
+    std::vector<cv::KeyPoint> keypoints;
+    cv::Mat descriptors;
+    Scope scope;
+
+}*/
 
 class FeatureStrategy {
 

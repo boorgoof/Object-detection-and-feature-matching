@@ -39,7 +39,9 @@ int main(int argc, const char* argv[]){
         std::cerr << "Cast failed" << std::endl;
     }
 
+    int i=0;
     for (auto& obj_dataset : datasets) {
+        if (i==0){i++; continue;}
 
         const Object_Type& type = obj_dataset.first;
         Dataset& ds = obj_dataset.second;
@@ -54,8 +56,11 @@ int main(int argc, const char* argv[]){
         double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
         std::cout << "Mean IoU for " << obj_dataset.first.to_string() << ": " << meanIoU  << std::endl;
 
-        break;
+        //break;
+        i++;
     }
+
+
 
 }
 

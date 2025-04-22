@@ -9,27 +9,27 @@
 
 */
 
-/*
+
 ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset,  QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const {
     
     std::vector<ModelFeatures> models_features;
     detectModelsFeatures(dataset,this->features_detector, models_features);
     
-    //for(const auto& model : models_features){
-    //    cv::Mat model_img = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].first);
-    //    cv::Mat img_out;
-    //    cv::drawKeypoints( model_img, model.keypoints, img_out );
-    //    cv::imshow("model keypoints", img_out);
-    //    cv::waitKey(0);
-    //}
+    for(const auto& model : models_features){
+        cv::Mat model_img = Utils::Loader::load_image(dataset.get_models()[model.dataset_models_idx].first);
+        cv::Mat img_out;
+        cv::drawKeypoints( model_img, model.keypoints, img_out );
+        cv::imshow("model keypoints", img_out);
+        cv::waitKey(0);
+    }
     
    
     this->features_detector->detectAndCompute(query_img,  cv::noArray(),  query_features.keypoints, query_features.descriptors); 
     //
-    //cv::Mat img_out;
-    //cv::drawKeypoints( query_img, query_keypoints, img_out );
-    //cv::imshow("query img keypoints", img_out);
-    //cv::waitKey(0);
+    cv::Mat img_out;
+    cv::drawKeypoints( query_img, query_features.keypoints, img_out );
+    cv::imshow("query img keypoints", img_out);
+    cv::waitKey(0);
     //
     
     std::vector<cv::DMatch> out_matches_1;
@@ -81,10 +81,10 @@ ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& qu
     out_matches = out_matches_2;
     return best_model;
 }
-*/
 
 
-ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const {
+
+/*ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& query_img, const Dataset& dataset, QueryFeatures& query_features, std::vector<cv::DMatch>& out_matches) const {
     
     std::vector<ModelFeatures> models_features;
     detectModelsFeatures(dataset,this->features_detector, models_features);
@@ -98,7 +98,7 @@ ModelFeatures SIFT_FLANN_strategy::detect_and_match_best_model(const cv::Mat& qu
     ModelFeatures best_model = models_features[best_model_idx];
 
     return best_model;
-}
+}*/
 
 
 

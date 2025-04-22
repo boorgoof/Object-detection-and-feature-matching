@@ -25,7 +25,7 @@ class Dataset{
      * @brief test_items vector of pairs of labels and image filepath.
      * @details one image can have more labels since more than one object can appear, also one image can contain objects (and labels) of other objects types.
      */
-    std::vector<std::pair<std::vector<Label>, std::string>> test_items;
+    std::vector<std::pair<std::vector<Label>, std::string>> test_items; //MODIFY, BUILD A MAP OF string(filepath test image) - label
     /**
      * @brief models vector of pairs of image and mask filepath (image first, mask second).
      * @details the image is the colored version of the object, the mask filters out the background of the image.

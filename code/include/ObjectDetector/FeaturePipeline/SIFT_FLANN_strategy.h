@@ -12,7 +12,7 @@ class SIFT_FLANN_strategy : public FeatureStrategy {
     
     public:
 
-        SIFT_FLANN_strategy() : features_detector(cv::SIFT::create()),
+        SIFT_FLANN_strategy() : features_detector(cv::ORB::create()),
                                 features_matcher(cv::makePtr<cv::FlannBasedMatcher>(cv::makePtr<cv::flann::KDTreeIndexParams>(5), cv::makePtr<cv::flann::SearchParams>(50) )) {}
 
 
