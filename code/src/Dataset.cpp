@@ -147,3 +147,40 @@ std::ostream& operator<<(std::ostream& os, const std::pair<std::string, std::str
 
     return os;
 }
+
+std::map<Object_Type, Dataset> Utils::Loader::load_datasets(const std::string& dataset_path){
+    
+    std::vector<std::string> dataset_subfolders = Utils::Directory::get_folder_filenames(dataset_path);
+
+    //REMOVING sugar box SUBFOLDER
+    //dataset_subfolders.erase(dataset_subfolders.begin());
+
+    std::map<Object_Type, Dataset> datasets;
+
+    for(auto it=dataset_subfolders.begin(); it != dataset_subfolders.end(); ++it){
+        
+        std::vector<std::string> tokens;
+        const size_t n_f = Utils::String::split_string(*it, tokens, '/');
+        datasets.insert(std::pair<Object_Type, Dataset>((tokens[n_f-1]), Dataset(Object_Type(tokens[n_f-1]), *it)));
+        
+    }
+
+    /* PRINT JUST TO CHECK IF DATASET IS LOADED CORRECTLY
+    for(auto it=datasets.begin(); it != datasets.end(); ++it){
+
+        std::cout << "DATASET" << it->second << std::endl;
+
+        auto items = it->second.get_items();
+        for(auto it2 = items.begin(); it2 != items.end(); ++it2){
+            std::cout << "item: \n" <<  *it2 << std::endl;
+        }
+
+        auto models = it->second.get_models();
+        for(auto it2 = models.begin(); it2 != models.end(); ++it2){
+            std::cout << "model: \n" << *it2 << std::endl;
+        }
+    }
+    */
+
+    return datasets;
+}

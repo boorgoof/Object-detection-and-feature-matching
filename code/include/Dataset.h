@@ -95,4 +95,8 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Label>& v);
 
 std::ostream& operator<<(std::ostream& os, const std::pair<std::string, std::string>& p);
 
+namespace Utils::Loader{
+    std::map<Object_Type, Dataset> load_datasets(const std::string& dataset_path);
+}
+
 #endif

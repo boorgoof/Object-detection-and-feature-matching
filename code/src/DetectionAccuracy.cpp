@@ -53,9 +53,10 @@ double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::ma
 
                 double iou = Utils::DetectionAccuracy::calculateIoU(predicted_label, real_label);
                 sum = sum + iou;
-                total_predictions++;
+                
 
             }
+            total_predictions++;
         }
         
     }
@@ -86,13 +87,13 @@ double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj,
         
         for (const auto& real_label : real_labels) {
             
-            if (real_label.get_class_name().to_string() != obj.to_string()) {
+            if (real_label.get_class_name().get_type() != obj.get_type()) {
                 continue;
             }
 
             for (const auto& predicted_label : predicted_labels) {
 
-                if (predicted_label.get_class_name().to_string() != obj.to_string()) {
+                if (predicted_label.get_class_name().get_type() != obj.get_type()) {
                     continue;
                 }
 
