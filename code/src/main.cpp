@@ -30,18 +30,13 @@ int main(int argc, const char* argv[]){
 
     int i=0;
     for (auto& obj_dataset : datasets) {
-        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(cv::SIFT::create()), new FeatureMatcher(cv::FlannBasedMatcher::create()), obj_dataset.second);
-        FeaturePipeline* pipeline = dynamic_cast<FeaturePipeline*>(object_detector);
-
-        if (!pipeline) {
-            std::cerr << "Cast failed" << std::endl;
-        }
-
+        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::ORB), new FeatureMatcher(MatcherType::FLANN), obj_dataset.second);
+        
         const Object_Type& type = obj_dataset.first;
         Dataset& ds = obj_dataset.second;
 
         std::map<std::string, std::vector<Label>> predicted_items; 
-        pipeline->detect_object_whole_dataset(ds, predicted_items);
+        object_detector->detect_object_whole_dataset(ds, predicted_items);
 
         std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_test_items();
         double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);

@@ -12,8 +12,8 @@
 class FeaturePipeline : public ObjectDetector {
 
     private:
-        std::unique_ptr<FeatureDetector> detector;
-        std::unique_ptr<FeatureMatcher> matcher;
+        FeatureDetector* detector;
+        FeatureMatcher* matcher;
     
         Dataset& dataset;
         std::vector<ModelFeatures> models_features;
@@ -23,10 +23,15 @@ class FeaturePipeline : public ObjectDetector {
             this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features);
         }
 
+        void update_detector_matcher_compatibility();
+
     public:
         FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset) // chiedere bene a matte il &&
-            : detector(fd), matcher(fm), dataset{dataset} { this->init_models_features();}
-    
+            : detector{fd}, matcher{fm}, dataset{dataset} { this->update_detector_matcher_compatibility(); this->init_models_features();}
+        ~FeaturePipeline() {
+            delete detector;
+            delete matcher;
+        }
 
         /*void addDetectorComponent(FeatureDetector* fd) {
             detector.release();

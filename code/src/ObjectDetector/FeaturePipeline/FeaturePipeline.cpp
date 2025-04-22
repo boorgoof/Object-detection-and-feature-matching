@@ -1,6 +1,11 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
 
-
+void FeaturePipeline::update_detector_matcher_compatibility() {
+    if (this->detector->getType() == DetectorType::ORB && this->matcher->getType() == MatcherType::FLANN) {
+        delete this->matcher;
+        this->matcher = new FeatureMatcher(MatcherType::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2)));
+    }
+}
 
 void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) {
 

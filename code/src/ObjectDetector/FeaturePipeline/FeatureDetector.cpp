@@ -3,6 +3,20 @@
 #include "../../../include/Utils.h"
 
 
+void FeatureDetector::init(){
+    switch (this->type) {
+        case DetectorType::SIFT:
+            this->features_detector = cv::SIFT::create();
+            break;
+        case DetectorType::ORB:
+            this->features_detector = cv::ORB::create();
+            break;
+        default:
+            throw std::invalid_argument("Invalid feature detector type");
+    }
+}
+
+
 void FeatureDetector::detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const {
     this->features_detector->detectAndCompute(img, cv::noArray(), keypoints, descriptors);
 }

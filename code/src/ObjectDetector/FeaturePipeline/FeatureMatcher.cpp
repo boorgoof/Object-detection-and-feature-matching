@@ -1,5 +1,18 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeatureMatcher.h"
 
+void FeatureMatcher::init(){
+    switch (this->type) {
+        case MatcherType::FLANN:
+            this->features_matcher = cv::FlannBasedMatcher::create();
+            break;
+        case MatcherType::BRUTEFORCE:
+            this->features_matcher = cv::BFMatcher::create(cv::NORM_L2);
+            break;
+        default:
+            throw std::invalid_argument("Invalid feature matcher type");
+    }
+}
+
 void FeatureMatcher::matchFeatures(const cv::Mat& queryDescriptors, const cv::Mat& modelDescriptors, std::vector<cv::DMatch>& matches) const{
     matches.clear();
 
