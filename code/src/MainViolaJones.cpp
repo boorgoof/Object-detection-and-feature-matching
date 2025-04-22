@@ -45,7 +45,8 @@ int main(){
 int main() {
     // Load the trained cascade model
     cv::CascadeClassifier cascade;
-    std::string cascadePath = "../Image_generated/cascade_mustard_bottle24/cascade.xml";
+    //std::string cascadePath = "../Image_generated/cascade_mustard_bottle24/cascade.xml";
+    std::string cascadePath = "../Image_generated/cascade_power_drill/cascade.xml";
     if (!cascade.load(cascadePath)) {
         std::cerr << "Error loading cascade file: " << cascadePath << std::endl;
         return -1;
@@ -54,7 +55,9 @@ int main() {
     // Get the list of test images (adjust extension if needed)
     std::vector<cv::String> imageFiles;
     //std::string testDir = "../dataset/006_mustard_bottle/test_images/*.jpg";
-    std::string testDir = "../Image_generated/Mustard_bottle_Generated/*.png";
+    //std::string testDir = "../Image_generated/Mustard_bottle_Generated/*.png";
+    std::string testDir = "../dataset/035_power_drill/test_images/*.jpg";
+    //std::string testDir = "../Image_generated/Power_drill_Generated/*.png";
     cv::glob(testDir, imageFiles, false);
     if (imageFiles.empty()) {
         std::cerr << "No images found in " << testDir << std::endl;
