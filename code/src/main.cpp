@@ -48,7 +48,7 @@ int main(int argc, const char* argv[]){
         std::map<std::string, std::vector<Label>> predicted_items; 
         pipeline->detect_object_whole_dataset(ds, predicted_items);
 
-        std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_items_map();
+        std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_test_items();
         double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);
         std::cout << "Accuracy for " << obj_dataset.first.to_string() << ": " << accuracy << std::endl;
 

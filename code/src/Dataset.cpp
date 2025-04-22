@@ -49,8 +49,8 @@ const size_t Dataset::load_test_items(const std::string& folderpath){
 
         //if the 2 row filenames are the same then the pair label-image is correct
         if(test_image_file_name_raw.compare(label_file_name_raw) == 0){
-            //load label and store image filename in vector of items
-            this->test_items.push_back(std::pair<std::vector<Label>, std::string>(Utils::Loader::load_label_file((*it_l)), *it_i));
+            //load label and store image filename in map of items
+            this->test_items[*it_i] = Utils::Loader::load_label_file((*it_l));
         }
         else throw CustomErrors::ImageLabelMismatch((*it_i),(*it_l), "IMAGE FILENAME AND LABEL FILENAME MISMATCH");
         ++it_i;
@@ -108,23 +108,8 @@ const size_t Dataset::load_models(const std::string& folderpath){
     return 0;
 }
 
-const std::map<std::string, std::vector<Label>> Dataset::get_items_map() const {
-    
-    std::map<std::string, std::vector<Label>> items_map;
-
-    for (const auto& item : this->test_items) {
-        
-        const std::vector<Label>& labels = item.first;
-        const std::string& filename = item.second;
-
-        items_map[filename].insert(items_map[filename].end(), labels.begin(), labels.end());
-    }
-
-    return items_map;
-}
-
 std::ostream& operator<<(std::ostream& os, const Dataset& d){
-    os << d.get_folderpath() <<" type: " << d.get_type() << " #test items: " << d.get_items().size() << " #models " << d.get_models().size();
+    os << d.get_folderpath() <<" type: " << d.get_type() << " #test items: " << d.get_test_items().size() << " #models " << d.get_models().size();
     return os;
 }
 

@@ -7,11 +7,11 @@ const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset,
     
     predicted_items.clear();
     
-    const std::vector<std::pair<std::vector<Label>, std::string>>& test_data = dataset.get_items();
+    const std::map<std::string, std::vector<Label>>& test_data = dataset.get_test_items();
 
-    for(auto it=test_data.begin(); it != test_data.end(); ++it){
+    for(auto test_item : test_data){
         
-        this->detect_objects_dataset(it->second, dataset, predicted_items);
+        this->detect_objects_dataset(test_item.first, dataset, predicted_items);
     };
 
     return predicted_items.size();
