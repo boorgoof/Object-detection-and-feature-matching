@@ -69,8 +69,7 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
 /*
 Label FeaturePipeline::findBoundingBox(
 
-    void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels) {
-    } const std::vector<cv::DMatch> &matches,
+    const std::vector<cv::DMatch> &matches,
     const std::vector<cv::KeyPoint> &query_keypoint,
     const std::vector<cv::KeyPoint> &model_keypoint,
     const cv::Mat &imgModel,
@@ -153,8 +152,14 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
 
     cv::Mat imgQueryCopy = imgQuery.clone();
     cv::rectangle(imgQueryCopy, boundingBox, cv::Scalar(0,255,0), 2); // Disegna un rettangolo
+
+    for (const auto& match : matches) {
+        cv::circle(imgQueryCopy, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
+    }
+
     cv::imshow("imgQuery", imgQueryCopy);
     cv::waitKey(0);
 
     return Label(object_type, boundingBox);
 }
+    
