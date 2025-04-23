@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include "../include/Utils.h"
@@ -27,27 +28,46 @@ int main(int argc, const char* argv[]){
     //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = Utils::Loader::load_datasets(dataset_path);
 
+    std::ofstream log_file("log file"); 
 
-    int i=0;
     for (auto& obj_dataset : datasets) {
-        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::ORB), new FeatureMatcher(MatcherType::FLANN), obj_dataset.second);
+
+        DetectorType detector_type;
+        MatcherType matcher_type;
+        for (auto& d_type : detector_type.getDetectorTypes()) {
+            
+            for (auto& m_type : matcher_type.getMatcherTypes()) {
         
-        const Object_Type& type = obj_dataset.first;
-        Dataset& ds = obj_dataset.second;
+                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second);
+        
+                const Object_Type& type = obj_dataset.first;
+                Dataset& ds = obj_dataset.second;
+        
+                std::map<std::string, std::vector<Label>> predicted_items; 
+                object_detector->detect_object_whole_dataset(ds, predicted_items);
+        
+                std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_test_items();
 
-        std::map<std::string, std::vector<Label>> predicted_items; 
-        object_detector->detect_object_whole_dataset(ds, predicted_items);
+                double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);
+                double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
+                
 
-        std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_test_items();
-        double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);
-        std::cout << "Accuracy for " << obj_dataset.first.to_string() << ": " << accuracy << std::endl;
+                log_file << "Objects detection pipeline: " << type.to_string() << "\n";
+                log_file << "FeatureDetector: " << DetectorType::toString(d_type) << ", FeatureMatcher: " << MatcherType::toString(m_type) << "\n";
+                log_file << "Accuracy: " << accuracy << "\n";
+                log_file << "Mean IoU: " << meanIoU << "\n\n";
 
-        double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
-        std::cout << "Mean IoU for " << obj_dataset.first.to_string() << ": " << meanIoU  << std::endl;
+                
+                std::cout << "Objects detection pipeline: " << type.to_string() << "\n";
+                std::cout << "FeatureDetector: " << DetectorType::toString(d_type) << ", FeatureMatcher: " << MatcherType::toString(m_type) << "\n";
+                std::cout << "Accuracy: " << accuracy << "\n";
+                std::cout << "Mean IoU: " << meanIoU << "\n\n";
+           
+            }
+                
+        }
+
     }
-
-
-
 }
 
 

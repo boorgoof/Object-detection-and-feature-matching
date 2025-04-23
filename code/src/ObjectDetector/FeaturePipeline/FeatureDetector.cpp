@@ -5,10 +5,10 @@
 
 void FeatureDetector::init(){
     switch (this->type) {
-        case DetectorType::SIFT:
+        case DetectorType::Type::SIFT:
             this->features_detector = cv::SIFT::create();
             break;
-        case DetectorType::ORB:
+        case DetectorType::Type::ORB:
             this->features_detector = cv::ORB::create();
             break;
         default:

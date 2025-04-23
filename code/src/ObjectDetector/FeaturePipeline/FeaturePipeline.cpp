@@ -1,9 +1,9 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
 
 void FeaturePipeline::update_detector_matcher_compatibility() {
-    if (this->detector->getType() == DetectorType::ORB && this->matcher->getType() == MatcherType::FLANN) {
+    if (this->detector->getType() == DetectorType::Type::ORB && this->matcher->getType() == MatcherType::Type::FLANN) {
         delete this->matcher;
-        this->matcher = new FeatureMatcher(MatcherType::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2)));
+        this->matcher = new FeatureMatcher(MatcherType::Type::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2)));
     }
 }
 
