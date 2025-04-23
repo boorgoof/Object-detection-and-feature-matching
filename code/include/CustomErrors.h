@@ -6,6 +6,15 @@
 
 namespace CustomErrors {
 
+    class InvalidArgumentError : public std::runtime_error {
+    public:
+        InvalidArgumentError(const std::string& argument, const std::string& message)
+            : std::runtime_error(message), argument(argument) {}
+        const std::string& getFilename() const { return argument; }
+    private:
+        std::string argument;
+    };
+    
     class ImageLoadError : public std::runtime_error {
     public:
         ImageLoadError(const std::string& filename, const std::string& message)

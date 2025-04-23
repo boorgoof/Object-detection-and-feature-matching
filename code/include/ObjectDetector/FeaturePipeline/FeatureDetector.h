@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "Features.h"
+class ImageFilter;
 
 class DetectorType{
 
@@ -41,7 +42,7 @@ class FeatureDetector{
     public:
     FeatureDetector(const DetectorType::Type& type) : type{type} {this->init();}
     void detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const;
-    void detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features) const;
+    void detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, ImageFilter* image_filter) const;
 
     void updateDetector(cv::Ptr<cv::Feature2D> new_detector) {
         this->features_detector.release();

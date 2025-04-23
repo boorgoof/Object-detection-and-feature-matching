@@ -8,6 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include "../../Label.h"
 #include "Features.h"
+class ImageFilter;
 
 class FeaturePipeline : public ObjectDetector {
 
@@ -15,32 +16,32 @@ class FeaturePipeline : public ObjectDetector {
         FeatureDetector* detector;
         FeatureMatcher* matcher;
     
+        ImageFilter* model_imagefilter;
+        ImageFilter* test_imagefilter;
+
         Dataset& dataset;
         std::vector<ModelFeatures> models_features;
 
-        void init_models_features() {
-            this->models_features.clear();
-            this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features);
-        }
-
+        void init_models_features();
         void update_detector_matcher_compatibility();
 
     public:
-        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset) // chiedere bene a matte il &&
-            : detector{fd}, matcher{fm}, dataset{dataset} { this->update_detector_matcher_compatibility(); this->init_models_features();}
-        ~FeaturePipeline() {
-            delete detector;
-            delete matcher;
-        }
+        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset, ImageFilter* model_imagefilter = nullptr, ImageFilter* test_imagefilter = nullptr)
+            : detector{fd}, matcher{fm}, dataset{dataset} {this->model_imagefilter = model_imagefilter; this->test_imagefilter = test_imagefilter; this->update_detector_matcher_compatibility(); this->init_models_features();}
+        ~FeaturePipeline();
 
-        /*void addDetectorComponent(FeatureDetector* fd) {
-            detector.release();
-            detector.
+        void addDetectorComponent(FeatureDetector* fd) {
+            detector = fd;
         }
-        void addMatcherComponent(std::unique_ptr<FeatureMatcher>&& fm) {
-            matcher.release();
-            matcher = std::move(fm);
-        }*/
+        void addMatcherComponent(FeatureMatcher* fm) {
+            matcher = fm;
+        }
+        void addModelImageFilterComponent(ImageFilter* imagefilter) {
+            this->model_imagefilter = imagefilter;
+        }
+        void addTestImageFilterComponent(ImageFilter* imagefilter) {
+            this->test_imagefilter = imagefilter;
+        }
 
         void setDataset(Dataset& dataset) {
             this->dataset = dataset;

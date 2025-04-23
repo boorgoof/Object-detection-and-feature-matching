@@ -1,7 +1,7 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeatureDetector.h"
 #include "../../../include/CustomErrors.h"
 #include "../../../include/Utils.h"
-
+#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
 
 void FeatureDetector::init(){
     switch (this->type) {
@@ -21,7 +21,7 @@ void FeatureDetector::detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoin
     this->features_detector->detectAndCompute(img, cv::noArray(), keypoints, descriptors);
 }
 
-void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features) const {
+void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, ImageFilter* image_filter) const {
     models_features.clear();
     
     for (size_t idx = 0; idx < models.size(); ++idx) {
@@ -36,6 +36,10 @@ void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::stri
         }
         if (mask.empty()) {
             throw CustomErrors::ImageLoadError(model_pair.second, "Error in loading mask for model feature detection");
+        }
+        //model image filtering if the filter component is present
+        if(image_filter != nullptr){
+            img = image_filter->apply_filters(img);
         }
 
         std::vector<cv::KeyPoint> keypoints;

@@ -5,6 +5,7 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
+#include "../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
 
 
 
@@ -37,8 +38,14 @@ int main(int argc, const char* argv[]){
         for (auto& d_type : detector_type.getDetectorTypes()) {
             
             for (auto& m_type : matcher_type.getMatcherTypes()) {
-        
-                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second);
+                //model image filter pipeline (currenlty only gaussian blur)
+                ImageFilter* model_imagefilter = new ImageFilter();
+                model_imagefilter->add_filter("Gaussian Blur", Filters::gaussian_blur, cv::Size(5,5));
+                //test image filter pipeline (currently only gaussian blur)
+                ImageFilter* test_imagefilter = new ImageFilter();
+                test_imagefilter->add_filter("Gaussian Blur", Filters::gaussian_blur, cv::Size(5,5));
+                //create the object detector pipeline
+                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second, model_imagefilter, test_imagefilter);
         
                 const Object_Type& type = obj_dataset.first;
                 Dataset& ds = obj_dataset.second;

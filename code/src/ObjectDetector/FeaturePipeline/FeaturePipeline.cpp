@@ -1,4 +1,10 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
+#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+
+void FeaturePipeline::init_models_features() {
+    this->models_features.clear();
+    this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features, this->model_imagefilter);
+}
 
 void FeaturePipeline::update_detector_matcher_compatibility() {
     if (this->detector->getType() == DetectorType::Type::ORB && this->matcher->getType() == MatcherType::Type::FLANN) {
@@ -7,15 +13,29 @@ void FeaturePipeline::update_detector_matcher_compatibility() {
     }
 }
 
+FeaturePipeline::~FeaturePipeline() {
+    delete this->detector;
+    delete this->matcher;
+    delete this->model_imagefilter;
+    delete this->test_imagefilter;
+}
+
 void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) {
 
     out_labels.clear();
 
     //models' features are already detected and stored in the pipeline (they always remain the same for every test image, so they are detected only once)
 
+    cv::Mat src_img_filtered;
+    //test image filtering if the filter component is present
+    if (this->test_imagefilter != nullptr) {
+        src_img_filtered = this->test_imagefilter->apply_filters(src_img);
+    }
+
+
     //detects test image features
     QueryFeatures query_features;
-    this->detector->detectFeatures(src_img, query_features.keypoints, query_features.descriptors);
+    this->detector->detectFeatures(src_img_filtered, query_features.keypoints, query_features.descriptors);
     
     //matches test image features with every models' features and store them in out_matches
     std::vector<std::vector<cv::DMatch>> out_matches;
@@ -42,7 +62,7 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     //calculates bounding box of the object found in the test image
     cv::Mat imgModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].first);
     cv::Mat maskModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].second);
-    Label labelObj = findBoundingBox(out_matches[best_model_idx], query_features.keypoints, this->models_features[best_model_idx].keypoints, imgModel,  maskModel, src_img, this->dataset.get_type());
+    Label labelObj = findBoundingBox(out_matches[best_model_idx], query_features.keypoints, this->models_features[best_model_idx].keypoints, imgModel,  maskModel, src_img_filtered, this->dataset.get_type());
     
     out_labels.push_back(labelObj);
 }
