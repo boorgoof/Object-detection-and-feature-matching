@@ -39,7 +39,7 @@ int main(int argc, const char* argv[]){
         for (auto& d_type : detector_type.getDetectorTypes()) {
             
             for (auto& m_type : matcher_type.getMatcherTypes()) {
-
+                /*
                 //model image filter pipeline (currenlty only gaussian blur)
                 ImageFilter* model_imagefilter = new ImageFilter();
                 model_imagefilter->add_filter("Gaussian Blur", Filters::gaussian_blur, cv::Size(5,5));
@@ -50,7 +50,10 @@ int main(int argc, const char* argv[]){
                 
                 //create the object detector pipeline
                 ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second, model_imagefilter, test_imagefilter);
-        
+                */
+                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second);
+
+
                 const Object_Type& type = obj_dataset.first;
                 Dataset& ds = obj_dataset.second;
         

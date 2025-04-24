@@ -123,6 +123,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     }
 
     cv::Mat cropped_imgModel = imgModel(cv::boundingRect(maskModel)); // crop the image to remove the white background of the mask
+    cv::Mat cropped_maskModel = maskModel(cv::boundingRect(maskModel)); // crop the mask to remove the white background of the mask
 
     std::vector<cv::Point2f> query_pts, model_pts;
     for (const auto& match : matches) {
@@ -162,10 +163,10 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         std::cout << "model_corners[" << i << "]: " << model_corners[i] << std::endl;
     }
 
-    std::vector<cv::Point2f> scene_corners;
+    std::vector<cv::Point2f> scene_corners;     //corners of the detected object in the scene (not a horizontal/vertical rectangle, but commonly rotated)
     cv::perspectiveTransform(model_corners, scene_corners, H);
     
-    scene_corners[0] = scene_corners[0] + model_corners[1] - model_corners[0];
+    scene_corners[0] = scene_corners[0] + model_corners[1] - model_corners[0];  //keep the subtraction even if model_corners[0] is 0,0
     scene_corners[1] = scene_corners[1] + model_corners[1] - model_corners[0];
     scene_corners[2] = scene_corners[2] + model_corners[1] - model_corners[0];
     scene_corners[3] = scene_corners[3] + model_corners[1] - model_corners[0];
@@ -183,23 +184,11 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     }
 
     cv::Mat imgQueryCopy = imgQuery.clone();
-    cv::Rect sceneBB = cv::boundingRect(scene_corners);
 
-    cv::polylines(imgQueryCopy, scene_corners_int, true, cv::Scalar(255, 255, 255), 4); // Disegna un poligono
-    //cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 10); // Disegna un rettangolo
-    
-    //cv::polylines(imgQueryCopy, scene_corners, true, cv::Scalar(0, 255, 0), 4); // Disegna un poligono
-    
-    /*
-    cv::line( imgQueryCopy, scene_corners[0] + model_corners[1] - model_corners[0], scene_corners[1] + model_corners[1] - model_corners[0], cv::Scalar(0, 255, 0), 4 );
-    cv::line( imgQueryCopy, scene_corners[1] + model_corners[1] - model_corners[0], scene_corners[2] + model_corners[1] - model_corners[0], cv::Scalar( 0, 255, 0), 4 );
-    cv::line( imgQueryCopy, scene_corners[2] + model_corners[1] - model_corners[0], scene_corners[3] + model_corners[1]- model_corners[0] , cv::Scalar( 0, 255, 0), 4 );
-    cv::line( imgQueryCopy, scene_corners[3] + model_corners[1] - model_corners[0] , scene_corners[0] + model_corners[1] - model_corners[0], cv::Scalar( 0, 255, 0), 4 );
-    */
+    cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
 
-    /*for (const auto& match : matches) {
-        cv::circle(imgQueryCopy, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
-    }*/
+    cv::polylines(imgQueryCopy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
+    cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 5);                      //GREEN draw the bounding box (axis-aligned rectangle) on the image
 
     /*
     cv::drawKeypoints(imgModel, model_keypoint, imgModel, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -212,22 +201,22 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     */
 
     cv::imshow("test image /w bounding box", imgQueryCopy);
-    cv::waitKey(0);
     
+    cv::Mat imgQueryMatches = imgQuery.clone();
     cv::drawMatches( 
         cropped_imgModel,
         model_keypoint,
         imgQuery,
         query_keypoint,
         matches,
-        imgQueryCopy,
+        imgQueryMatches,
         cv::Scalar(0, 255, 0),
         cv::Scalar(0, 0, 255),
         homography_mask
         );
     
 
-    cv::imshow("matches", imgQueryCopy);
+    cv::imshow("matches", imgQueryMatches);
     cv::waitKey(0);
 
     return Label(object_type, cv::Rect2d(scene_corners[0].x, scene_corners[0].y,
