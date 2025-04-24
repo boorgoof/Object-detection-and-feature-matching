@@ -24,8 +24,8 @@ void FeatureMatcher::matchFeatures(const cv::Mat& queryDescriptors, const cv::Ma
     }
 
     std::vector<std::vector<cv::DMatch>> knn_matches;
-    this->features_matcher->knnMatch(queryDescriptors, modelDescriptors, knn_matches, 2);  
-
+    this->features_matcher->knnMatch(modelDescriptors, queryDescriptors, knn_matches, 2);  
+    
     //apply Lowe's ratio test
     for (size_t i = 0; i < knn_matches.size(); i++) {
         if (knn_matches[i].size() >= 2) {
@@ -36,4 +36,18 @@ void FeatureMatcher::matchFeatures(const cv::Mat& queryDescriptors, const cv::Ma
             }
         }
     }
+/*
+    float ratio_threshold = 0.7f;
+    float distance_threshold = 200.0f; // puoi regolare questo valore in base al tuo caso
+
+    for (size_t i = 0; i < knn_matches.size(); i++) {
+        if (knn_matches[i].size() >= 2) {
+            const cv::DMatch& m = knn_matches[i][0];
+            const cv::DMatch& n = knn_matches[i][1];
+            if (m.distance < ratio_threshold * n.distance && m.distance < distance_threshold) {
+                matches.push_back(m);
+            }
+        }
+    }
+        */
 }

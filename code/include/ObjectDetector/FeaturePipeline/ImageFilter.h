@@ -24,9 +24,11 @@ class ImageFilter{
 };
 
 namespace Filters{
+    
     cv::Mat gaussian_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
     cv::Mat median_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
     cv::Mat average_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
+
 }
 
 template<typename FilterFunction, typename... Args>

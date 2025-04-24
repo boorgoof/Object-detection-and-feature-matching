@@ -44,3 +44,4 @@ cv::Mat Filters::average_blur(const cv::Mat& src_img, const cv::Size& kernel_siz
     cv::blur(src_img, dst_img, kernel_size);
     return dst_img;
 }
+

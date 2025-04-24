@@ -107,6 +107,96 @@ Label FeaturePipeline::findBoundingBox(
 }
 */
 
+
+Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
+    const std::vector<cv::KeyPoint>& query_keypoint,
+    const std::vector<cv::KeyPoint>& model_keypoint,
+    const cv::Mat& imgModel,
+    const cv::Mat& maskModel,
+    const cv::Mat& imgQuery,
+    Object_Type object_type) const 
+{
+    const int minMatches= 10;
+
+    if (matches.size() < minMatches) {
+        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
+        return Label(object_type, cv::Rect());
+    }
+
+    std::vector<cv::Point2f> query_pts, model_pts;
+    for (const auto& match : matches) {
+        query_pts.push_back(query_keypoint[match.queryIdx].pt);
+        model_pts.push_back(model_keypoint[match.trainIdx].pt);
+    }
+
+    cv::Mat mask;
+    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, mask);
+    if (H.empty()){
+        std::cout << "H empty" << std::endl;
+        return Label(object_type, cv::Rect());
+    }
+    std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
+    
+        
+    cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo dei pixel che non sono zero
+    std::vector<cv::Point2f> model_corners = {
+        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y)},
+        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y)},
+        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y + model_rect.height)},
+        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y + model_rect.height)}
+    };
+
+    std::vector<cv::Point2f> scene_corners;
+    cv::perspectiveTransform(model_corners, scene_corners, H);
+    
+
+    cv::Mat imgQueryCopy = imgQuery.clone();
+    cv::Rect sceneBB = cv::boundingRect(scene_corners);
+
+    cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 2); // Disegna un rettangolo
+    
+    //cv::polylines(imgQueryCopy, scene_corners, true, cv::Scalar(0, 255, 0), 4); // Disegna un poligono
+    
+    /*
+    cv::line( imgQueryCopy, scene_corners[0] + model_corners[1] - model_corners[0], scene_corners[1] + model_corners[1] - model_corners[0], cv::Scalar(0, 255, 0), 4 );
+    cv::line( imgQueryCopy, scene_corners[1] + model_corners[1] - model_corners[0], scene_corners[2] + model_corners[1] - model_corners[0], cv::Scalar( 0, 255, 0), 4 );
+    cv::line( imgQueryCopy, scene_corners[2] + model_corners[1] - model_corners[0], scene_corners[3] + model_corners[1]- model_corners[0] , cv::Scalar( 0, 255, 0), 4 );
+    cv::line( imgQueryCopy, scene_corners[3] + model_corners[1] - model_corners[0] , scene_corners[0] + model_corners[1] - model_corners[0], cv::Scalar( 0, 255, 0), 4 );
+    */
+
+    for (const auto& match : matches) {
+        cv::circle(imgQueryCopy, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
+    }
+
+    /*
+    cv::drawKeypoints(imgModel, model_keypoint, imgModel, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::imshow("imgmodel", imgModel);
+    cv::waitKey(0);
+
+    cv::drawKeypoints(imgQuery, query_keypoint, imgQueryCopy, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::imshow("imgQuery", imgQueryCopy);
+    cv::waitKey(0);
+    */
+    
+    cv::drawMatches( 
+        imgModel,
+        model_keypoint,
+        imgQuery,
+        query_keypoint,
+        matches,
+        imgQueryCopy
+        );
+    
+
+    cv::imshow("imgQuery", imgQueryCopy);
+    cv::waitKey(0);
+
+    return Label(object_type, cv::Rect2d(scene_corners[0].x, scene_corners[0].y,
+        scene_corners[2].x - scene_corners[0].x, scene_corners[2].y - scene_corners[0].y));
+}
+
+
+/*
 //METODO OPENCV MA NON VA - e invece sì ;)
 Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const std::vector<cv::KeyPoint>& query_keypoint,
@@ -124,17 +214,19 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     }
 
     std::vector<cv::Point2f> query_pts, model_pts;
-
     for (const auto& match : matches) {
         query_pts.push_back(query_keypoint[match.queryIdx].pt);
         model_pts.push_back(model_keypoint[match.trainIdx].pt);
     }
 
-    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0);
+    cv::Mat mask;
+    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, mask);
     if (H.empty()){
         std::cout << "H empty" << std::endl;
         return Label(object_type, cv::Rect());
     }
+    std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
+    
         
 
     cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo di dei pixel che non sono zero
@@ -162,4 +254,6 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
 
     return Label(object_type, boundingBox);
 }
-    
+
+
+*/
