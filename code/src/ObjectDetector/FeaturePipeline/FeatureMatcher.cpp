@@ -1,4 +1,7 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeatureMatcher.h"
+#include "../../../include/CustomErrors.h"
+
+
 
 void FeatureMatcher::init(){
     switch (this->type) {
@@ -9,7 +12,7 @@ void FeatureMatcher::init(){
             this->features_matcher = cv::BFMatcher::create(cv::NORM_L2);
             break;
         default:
-            throw std::invalid_argument("Invalid feature matcher type");
+            throw CustomErrors::InvalidArgumentError("type", "Invalid feature matcher type");
     }
 }
 
@@ -17,10 +20,10 @@ void FeatureMatcher::matchFeatures(const cv::Mat& queryDescriptors, const cv::Ma
     matches.clear();
 
     if (modelDescriptors.empty()) {
-        throw std::invalid_argument("Model features have not been previously completly detected");
+        throw CustomErrors::InvalidArgumentError("modelDescriptors", "Model descriptors are empty");
     }
     if (queryDescriptors.empty()) {
-        throw std::invalid_argument("Query features have not been previously completly detected");
+        throw CustomErrors::InvalidArgumentError("queryDescriptors", "Query descriptors are empty");
     }
 
     std::vector<std::vector<cv::DMatch>> knn_matches;

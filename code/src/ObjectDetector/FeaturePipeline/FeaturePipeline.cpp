@@ -26,12 +26,11 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
 
     //models' features are already detected and stored in the pipeline (they always remain the same for every test image, so they are detected only once)
 
-    cv::Mat src_img_filtered;
+    cv::Mat src_img_filtered = src_img.clone();
     //test image filtering if the filter component is present
     if (this->test_imagefilter != nullptr) {
         src_img_filtered = this->test_imagefilter->apply_filters(src_img);
     }
-
 
     //detects test image features
     QueryFeatures query_features;
@@ -123,21 +122,27 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         return Label(object_type, cv::Rect());
     }
 
+    cv::Mat cropped_imgModel = imgModel(cv::boundingRect(maskModel)); // crop the image to remove the white background of the mask
+
     std::vector<cv::Point2f> query_pts, model_pts;
     for (const auto& match : matches) {
         query_pts.push_back(query_keypoint[match.queryIdx].pt);
         model_pts.push_back(model_keypoint[match.trainIdx].pt);
     }
+    
 
-    cv::Mat mask;
-    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, mask);
+    cv::Mat homography_mask;
+    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, homography_mask);
     if (H.empty()){
         std::cout << "H empty" << std::endl;
         return Label(object_type, cv::Rect());
     }
-    std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
+    //std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
+    std::cout << "H: " << H << std::endl;
+    //cv::imshow("H mask:", mask);
+    //cv::waitKey(0);
     
-        
+    /*
     cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo dei pixel che non sono zero
     std::vector<cv::Point2f> model_corners = {
         {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y)},
@@ -145,15 +150,43 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y + model_rect.height)},
         {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y + model_rect.height)}
     };
+    */
+    std::vector<cv::Point2f> model_corners = {
+        {0, 0},
+        {static_cast<float>(cropped_imgModel.cols), 0},
+        {static_cast<float>(cropped_imgModel.cols), static_cast<float>(cropped_imgModel.rows)},
+        {0, static_cast<float>(cropped_imgModel.rows)}
+    };
+
+    for( int i = 0; i < model_corners.size(); i++){
+        std::cout << "model_corners[" << i << "]: " << model_corners[i] << std::endl;
+    }
 
     std::vector<cv::Point2f> scene_corners;
     cv::perspectiveTransform(model_corners, scene_corners, H);
     
+    scene_corners[0] = scene_corners[0] + model_corners[1] - model_corners[0];
+    scene_corners[1] = scene_corners[1] + model_corners[1] - model_corners[0];
+    scene_corners[2] = scene_corners[2] + model_corners[1] - model_corners[0];
+    scene_corners[3] = scene_corners[3] + model_corners[1] - model_corners[0];
+    
+    for( int i = 0; i < scene_corners.size(); i++){
+        std::cout << "scene_corners[" << i << "]: " << scene_corners[i] << std::endl;
+        
+    }
+
+    std::vector<cv::Point2i> scene_corners_int;
+    for( int i = 0; i < scene_corners.size(); i++){
+        scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));
+        std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
+        
+    }
 
     cv::Mat imgQueryCopy = imgQuery.clone();
     cv::Rect sceneBB = cv::boundingRect(scene_corners);
 
-    cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 2); // Disegna un rettangolo
+    cv::polylines(imgQueryCopy, scene_corners_int, true, cv::Scalar(255, 255, 255), 4); // Disegna un poligono
+    //cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 10); // Disegna un rettangolo
     
     //cv::polylines(imgQueryCopy, scene_corners, true, cv::Scalar(0, 255, 0), 4); // Disegna un poligono
     
@@ -164,9 +197,9 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::line( imgQueryCopy, scene_corners[3] + model_corners[1] - model_corners[0] , scene_corners[0] + model_corners[1] - model_corners[0], cv::Scalar( 0, 255, 0), 4 );
     */
 
-    for (const auto& match : matches) {
+    /*for (const auto& match : matches) {
         cv::circle(imgQueryCopy, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
-    }
+    }*/
 
     /*
     cv::drawKeypoints(imgModel, model_keypoint, imgModel, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -177,18 +210,24 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::imshow("imgQuery", imgQueryCopy);
     cv::waitKey(0);
     */
+
+    cv::imshow("test image /w bounding box", imgQueryCopy);
+    cv::waitKey(0);
     
     cv::drawMatches( 
-        imgModel,
+        cropped_imgModel,
         model_keypoint,
         imgQuery,
         query_keypoint,
         matches,
-        imgQueryCopy
+        imgQueryCopy,
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255),
+        homography_mask
         );
     
 
-    cv::imshow("imgQuery", imgQueryCopy);
+    cv::imshow("matches", imgQueryCopy);
     cv::waitKey(0);
 
     return Label(object_type, cv::Rect2d(scene_corners[0].x, scene_corners[0].y,

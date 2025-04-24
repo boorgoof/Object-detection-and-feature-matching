@@ -12,7 +12,7 @@ void FeatureDetector::init(){
             this->features_detector = cv::ORB::create();
             break;
         default:
-            throw std::invalid_argument("Invalid feature detector type");
+            throw CustomErrors::InvalidArgumentError("type", "Invalid feature detector type");
     }
 }
 
