@@ -7,7 +7,10 @@
 class ImageDatasetGenerator{
     public:
     void generateRotatedImages(const std::string&,  const std::string&, const std::string&, int, bool, int);
-    void generateLightVariations(const std::string&, const std::string&, int);
+    void generateLightVariations(const std::string&, const std::string&, const std::string&, int);
+
+    void generateGrayImage(const std::string&, const std::string&, const std::string&);
+
 };
 
 
