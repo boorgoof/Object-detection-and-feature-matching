@@ -16,15 +16,15 @@ struct ModelFeatures {
     : dataset_models_idx(-1), keypoints(), descriptors() {}
 };
 
-struct QueryFeatures {
+struct SceneFeatures {
 
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat descriptors;
 
-    QueryFeatures(const int query_idx, const std::vector<cv::KeyPoint>& keypoints, const cv::Mat& descriptors)
+    SceneFeatures( const std::vector<cv::KeyPoint>& keypoints, const cv::Mat& descriptors)
         : keypoints(keypoints), descriptors(descriptors) {}
 
-    QueryFeatures():  keypoints(), descriptors() {}
+    SceneFeatures():  keypoints(), descriptors() {}
 };
 
 #endif

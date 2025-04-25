@@ -33,14 +33,14 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     }
 
     //detects test image features
-    QueryFeatures query_features;
-    this->detector->detectFeatures(src_img_filtered, query_features.keypoints, query_features.descriptors);
+    SceneFeatures src_features;
+    this->detector->detectFeatures(src_img_filtered, src_features.keypoints, src_features.descriptors);
     
     //matches test image features with every models' features and store them in out_matches
     std::vector<std::vector<cv::DMatch>> out_matches;
     for(ModelFeatures model_features : this->models_features){
         std::vector<cv::DMatch> out_matches_t;
-        this->matcher->matchFeatures(query_features.descriptors, model_features.descriptors, out_matches_t);
+        this->matcher->matchFeatures(model_features.descriptors, src_features.descriptors, out_matches_t);
         out_matches.push_back(out_matches_t);
     }
 
@@ -61,97 +61,47 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     //calculates bounding box of the object found in the test image
     cv::Mat imgModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].first);
     cv::Mat maskModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].second);
-    Label labelObj = findBoundingBox(out_matches[best_model_idx], query_features.keypoints, this->models_features[best_model_idx].keypoints, imgModel,  maskModel, src_img_filtered, this->dataset.get_type());
+    Label labelObj = findBoundingBox(out_matches[best_model_idx],  this->models_features[best_model_idx].keypoints, src_features.keypoints, imgModel,  maskModel, src_img_filtered, this->dataset.get_type());
     
     out_labels.push_back(labelObj);
 }
-/*
-Label FeaturePipeline::findBoundingBox(
 
-    const std::vector<cv::DMatch> &matches,
-    const std::vector<cv::KeyPoint> &query_keypoint,
-    const std::vector<cv::KeyPoint> &model_keypoint,
-    const cv::Mat &imgModel,
-    const cv::Mat &maskModel,
-    const cv::Mat &imgQuery,
-    Object_Type object_type) const
-{
-    const int minMatches = 10;
-
-    if (matches.size() < minMatches) {
-        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
-        return Label(object_type, cv::Rect());
-    }
-
-    std::vector<cv::Point2f> query_pts, model_pts;
-    for (const auto& match : matches) {
-        query_pts.push_back(query_keypoint[match.queryIdx].pt);
-        model_pts.push_back(model_keypoint[match.trainIdx].pt);
-    }
-
-    
-    cv::Rect query_rect = cv::boundingRect(query_pts);
-
-    cv::Mat img = imgQuery.clone();
-    cv::rectangle(img, query_rect, cv::Scalar(0, 255, 0), 2);
-
-    // Togliere: è per capire se i punti sono corretti
-    for (const auto& match : matches) {
-        cv::circle(img, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
-    }
-
-    cv::imshow("Bounding Box on Query Image", img);
-    cv::waitKey(0);
-    return Label(object_type, query_rect);
-}
-*/
 
 
 Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
-    const std::vector<cv::KeyPoint>& query_keypoint,
     const std::vector<cv::KeyPoint>& model_keypoint,
-    const cv::Mat& imgModel,
-    const cv::Mat& maskModel,
-    const cv::Mat& imgQuery,
+    const std::vector<cv::KeyPoint>& scene_keypoint,
+    const cv::Mat& img_model,
+    const cv::Mat& mask_model,
+    const cv::Mat& img_scene,
     Object_Type object_type) const 
 {
     const int minMatches= 10;
+    std::cout << "ciao" << std::endl;
 
     if (matches.size() < minMatches) {
         std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
         return Label(object_type, cv::Rect());
     }
 
-    cv::Mat cropped_imgModel = imgModel(cv::boundingRect(maskModel)); // crop the image to remove the white background of the mask
-    cv::Mat cropped_maskModel = maskModel(cv::boundingRect(maskModel)); // crop the mask to remove the white background of the mask
+    cv::Mat cropped_imgModel = img_model(cv::boundingRect(mask_model)); // crop the image to remove the white background of the mask
+    cv::Mat cropped_maskModel = mask_model(cv::boundingRect(mask_model)); // crop the mask to remove the white background of the mask
 
-    std::vector<cv::Point2f> query_pts, model_pts;
+    std::vector<cv::Point2f> scene_pts, model_pts;
     for (const auto& match : matches) {
-        query_pts.push_back(query_keypoint[match.queryIdx].pt);
-        model_pts.push_back(model_keypoint[match.trainIdx].pt);
+        model_pts.push_back(model_keypoint[match.queryIdx].pt);
+        scene_pts.push_back(scene_keypoint[match.trainIdx].pt);
     }
     
-
+    
     cv::Mat homography_mask;
-    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, homography_mask);
+    cv::Mat H = cv::findHomography(model_pts, scene_pts, cv::RANSAC, 5.0, homography_mask);
     if (H.empty()){
         std::cout << "H empty" << std::endl;
         return Label(object_type, cv::Rect());
     }
-    //std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
     std::cout << "H: " << H << std::endl;
-    //cv::imshow("H mask:", mask);
-    //cv::waitKey(0);
-    
-    /*
-    cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo dei pixel che non sono zero
-    std::vector<cv::Point2f> model_corners = {
-        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y)},
-        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y)},
-        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y + model_rect.height)},
-        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y + model_rect.height)}
-    };
-    */
+
     std::vector<cv::Point2f> model_corners = {
         {0, 0},
         {static_cast<float>(cropped_imgModel.cols), 0},
@@ -166,11 +116,12 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     std::vector<cv::Point2f> scene_corners;     //corners of the detected object in the scene (not a horizontal/vertical rectangle, but commonly rotated)
     cv::perspectiveTransform(model_corners, scene_corners, H);
     
+    /*
     scene_corners[0] = scene_corners[0] + model_corners[1] - model_corners[0];  //keep the subtraction even if model_corners[0] is 0,0
     scene_corners[1] = scene_corners[1] + model_corners[1] - model_corners[0];
     scene_corners[2] = scene_corners[2] + model_corners[1] - model_corners[0];
     scene_corners[3] = scene_corners[3] + model_corners[1] - model_corners[0];
-    
+    */
     for( int i = 0; i < scene_corners.size(); i++){
         std::cout << "scene_corners[" << i << "]: " << scene_corners[i] << std::endl;
         
@@ -183,40 +134,31 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         
     }
 
-    cv::Mat imgQueryCopy = imgQuery.clone();
+    cv::Mat img_scene_copy = img_scene.clone();
 
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
 
-    cv::polylines(imgQueryCopy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
-    cv::rectangle(imgQueryCopy, sceneBB, cv::Scalar(0, 255, 0), 5);                      //GREEN draw the bounding box (axis-aligned rectangle) on the image
+    cv::polylines(img_scene_copy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
+    cv::rectangle(img_scene_copy, sceneBB, cv::Scalar(0, 255, 0), 5);                      //GREEN draw the bounding box (axis-aligned rectangle) on the image
 
-    /*
-    cv::drawKeypoints(imgModel, model_keypoint, imgModel, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    cv::imshow("imgmodel", imgModel);
-    cv::waitKey(0);
-
-    cv::drawKeypoints(imgQuery, query_keypoint, imgQueryCopy, cv::Scalar(0, 255, 0), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    cv::imshow("imgQuery", imgQueryCopy);
-    cv::waitKey(0);
-    */
-
-    cv::imshow("test image /w bounding box", imgQueryCopy);
     
-    cv::Mat imgQueryMatches = imgQuery.clone();
+    cv::imshow("test image /w bounding box", img_scene_copy);
+    
+    cv::Mat imgSceneMatches = img_scene.clone();
     cv::drawMatches( 
         cropped_imgModel,
         model_keypoint,
-        imgQuery,
-        query_keypoint,
+        img_scene,
+        scene_keypoint,
         matches,
-        imgQueryMatches,
+        imgSceneMatches,
         cv::Scalar(0, 255, 0),
         cv::Scalar(0, 0, 255),
         homography_mask
         );
     
 
-    cv::imshow("matches", imgQueryMatches);
+    cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
 
     return Label(object_type, cv::Rect2d(scene_corners[0].x, scene_corners[0].y,
@@ -224,64 +166,3 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
 }
 
 
-/*
-//METODO OPENCV MA NON VA - e invece sì ;)
-Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
-    const std::vector<cv::KeyPoint>& query_keypoint,
-    const std::vector<cv::KeyPoint>& model_keypoint,
-    const cv::Mat& imgModel,
-    const cv::Mat& maskModel,
-    const cv::Mat& imgQuery,
-    Object_Type object_type) const 
-{
-    const int minMatches= 10;
-
-    if (matches.size() < minMatches) {
-        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
-        return Label(object_type, cv::Rect());
-    }
-
-    std::vector<cv::Point2f> query_pts, model_pts;
-    for (const auto& match : matches) {
-        query_pts.push_back(query_keypoint[match.queryIdx].pt);
-        model_pts.push_back(model_keypoint[match.trainIdx].pt);
-    }
-
-    cv::Mat mask;
-    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0, mask);
-    if (H.empty()){
-        std::cout << "H empty" << std::endl;
-        return Label(object_type, cv::Rect());
-    }
-    std::vector<uchar> mask_vector = mask.reshape(1); // Convert the mask to a 1D vector
-    
-        
-
-    cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo di dei pixel che non sono zero
-
-    std::vector<cv::Point2f> model_corners = {
-        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y)},
-        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y)},
-        {static_cast<float>(model_rect.x + model_rect.width), static_cast<float>(model_rect.y + model_rect.height)},
-        {static_cast<float>(model_rect.x), static_cast<float>(model_rect.y + model_rect.height)}
-    };
-
-    std::vector<cv::Point2f> scene_corners;
-    cv::perspectiveTransform(model_corners, scene_corners, H);
-    cv::Rect boundingBox = cv::boundingRect(scene_corners);
-
-    cv::Mat imgQueryCopy = imgQuery.clone();
-    cv::rectangle(imgQueryCopy, boundingBox, cv::Scalar(0,255,0), 2); // Disegna un rettangolo
-
-    for (const auto& match : matches) {
-        cv::circle(imgQueryCopy, query_keypoint[match.queryIdx].pt, 5, cv::Scalar(255, 0, 0), 2);
-    }
-
-    cv::imshow("imgQuery", imgQueryCopy);
-    cv::waitKey(0);
-
-    return Label(object_type, boundingBox);
-}
-
-
-*/

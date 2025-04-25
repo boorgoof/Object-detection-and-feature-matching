@@ -37,7 +37,7 @@ class FeatureMatcher{
     FeatureMatcher(const MatcherType::Type& type) : type{type} {this->init();}
     FeatureMatcher(const MatcherType::Type& type, cv::DescriptorMatcher* matcher) : type{type}, features_matcher{cv::Ptr<cv::DescriptorMatcher>(matcher)} {}
 
-    void matchFeatures(const cv::Mat& queryDescriptors, const cv::Mat& modelDescriptors, std::vector<cv::DMatch>& matches) const;
+    void matchFeatures(const cv::Mat& modelDescriptors, const cv::Mat& sceneDescriptors, std::vector<cv::DMatch>& matches) const;
     
     void updateMatcher(cv::Ptr<cv::DescriptorMatcher> new_matcher) {
         this->features_matcher.release();
