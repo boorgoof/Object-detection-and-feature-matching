@@ -77,15 +77,17 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     Object_Type object_type) const 
 {
     const int minMatches= 10;
-    std::cout << "ciao" << std::endl;
 
     if (matches.size() < minMatches) {
         std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
         return Label(object_type, cv::Rect());
     }
 
-    cv::Mat cropped_imgModel = img_model(cv::boundingRect(mask_model)); // crop the image to remove the white background of the mask
-    cv::Mat cropped_maskModel = mask_model(cv::boundingRect(mask_model)); // crop the mask to remove the white background of the mask
+    //cv::Mat cropped_imgModel = img_model(cv::boundingRect(mask_model)); // crop the image to remove the white background of the mask
+    //cv::Mat cropped_maskModel = mask_model(cv::boundingRect(mask_model)); // crop the mask to remove the white background of the mask
+
+    cv::Mat cropped_imgModel = img_model.clone();   //just to avoid changing the names on the next varaibles, in the definitive version I will change the names
+    cv::Mat cropped_maskModel = mask_model.clone();
 
     std::vector<cv::Point2f> scene_pts, model_pts;
     for (const auto& match : matches) {
@@ -102,11 +104,19 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     }
     std::cout << "H: " << H << std::endl;
 
+    /*
     std::vector<cv::Point2f> model_corners = {
         {0, 0},
         {static_cast<float>(cropped_imgModel.cols), 0},
         {static_cast<float>(cropped_imgModel.cols), static_cast<float>(cropped_imgModel.rows)},
         {0, static_cast<float>(cropped_imgModel.rows)}
+    };*/
+    cv::Rect mask_rect = cv::boundingRect(cropped_maskModel);
+    std::vector<cv::Point2f> model_corners = {
+        {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y)},
+        {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y)},
+        {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y + mask_rect.height)},
+        {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y + mask_rect.height)}
     };
 
     for( int i = 0; i < model_corners.size(); i++){
