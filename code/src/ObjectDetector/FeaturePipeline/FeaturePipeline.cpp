@@ -161,8 +161,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
 
-    return Label(object_type, cv::Rect2d(scene_corners[0].x, scene_corners[0].y,
-        scene_corners[2].x - scene_corners[0].x, scene_corners[2].y - scene_corners[0].y));
+    return Label(object_type, sceneBB);
 }
 
 

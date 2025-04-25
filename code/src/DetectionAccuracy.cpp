@@ -113,3 +113,45 @@ double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj,
 }
 
 
+void Utils::DetectionAccuracy::printLabelsImg(const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems){
+
+    
+    std::string output_folder = "../Output/BoundingBox/";
+
+    if (!std::filesystem::exists(output_folder)) {
+        std::filesystem::create_directories(output_folder); 
+    }
+
+    for (const auto& item : predictedItems) {
+        
+        const std::string& filename = item.first;
+        const std::vector<Label>& predicted_labels = item.second;
+
+        // if the file isn't in the real map, skip it
+        if(realItems.find(filename) == realItems.end()){
+            continue;
+        }
+
+        const std::vector<Label>& real_labels = realItems.at(filename);
+        cv::Mat img = Utils::Loader::load_image(filename);
+        
+        if (img.empty()) {
+            throw CustomErrors::ImageLoadError("Error loading the img in printLabelsImg: " , filename);
+        }
+
+        std::string out_img_name = output_folder + Utils::Directory::get_file_basename(filename);
+        cv::Mat out_img = img.clone();
+
+        for (const auto& label : predicted_labels) {
+            cv::rectangle(out_img, label.get_bounding_box(), cv::Scalar(0, 0, 255), 2);
+        }
+
+        for (const auto& label : real_labels) {
+            cv::rectangle(out_img, label.get_bounding_box(), cv::Scalar(0, 255, 0), 2);
+        }
+
+        cv::imwrite(out_img_name, out_img);
+    }
+    
+  
+}

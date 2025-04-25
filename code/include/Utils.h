@@ -125,10 +125,10 @@ namespace Utils{
      * @brief Detection accuracy functions.
      */
     namespace DetectionAccuracy{
-
         double calculateIoU(const Label& predictedLabel, const Label& realLabel);
         double calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems);
         double calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems , double threshold = 0.5);
+        void printLabelsImg(const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems);
     };
 
 
