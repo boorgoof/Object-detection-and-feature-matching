@@ -39,8 +39,8 @@ void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::stri
         }
 
         //IF YOU WANT TO USE THE FULL IMAGE, COMMENT THE NEXT 2 LINES, otherwise the image will be cropped to the bounding box of the mask
-        img = img(cv::boundingRect(mask)); // crop the image to remove the white background of the mask
-        mask = mask(cv::boundingRect(mask)); // crop the mask to remove the white background of the mask
+        //img = img(cv::boundingRect(mask)); // crop the image to remove the white background of the mask
+        //mask = mask(cv::boundingRect(mask)); // crop the mask to remove the white background of the mask
 
         //model image filtering if the filter component is present
         if(image_filter != nullptr){
@@ -52,7 +52,7 @@ void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::stri
         this->features_detector->detectAndCompute(img, mask, keypoints, descriptors);
 
         ModelFeatures model {
-            idx,        
+            static_cast<int>(idx),        
             keypoints,
             descriptors
         };
