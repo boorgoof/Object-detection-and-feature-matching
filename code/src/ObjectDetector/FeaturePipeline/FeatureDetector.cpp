@@ -2,6 +2,7 @@
 #include "../../../include/CustomErrors.h"
 #include "../../../include/Utils.h"
 #include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+#include <opencv2/xfeatures2d.hpp>
 
 void FeatureDetector::init(){
     switch (this->type) {
@@ -10,6 +11,9 @@ void FeatureDetector::init(){
             break;
         case DetectorType::Type::ORB:
             this->features_detector = cv::ORB::create();
+            break;
+        case DetectorType::Type::SURF:
+            this->features_detector = cv::xfeatures2d::SURF::create();
             break;
         default:
             throw CustomErrors::InvalidArgumentError("type", "Invalid feature detector type");
@@ -39,8 +43,8 @@ void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::stri
         }
 
         //IF YOU WANT TO USE THE FULL IMAGE, COMMENT THE NEXT 2 LINES, otherwise the image will be cropped to the bounding box of the mask
-        //img = img(cv::boundingRect(mask)); // crop the image to remove the white background of the mask
-        //mask = mask(cv::boundingRect(mask)); // crop the mask to remove the white background of the mask
+        img = img(cv::boundingRect(mask)); // crop the image to remove the white background of the mask
+        mask = mask(cv::boundingRect(mask)); // crop the mask to remove the white background of the mask
 
         //model image filtering if the filter component is present
         if(image_filter != nullptr){

@@ -54,7 +54,6 @@ double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::ma
                 double iou = Utils::DetectionAccuracy::calculateIoU(predicted_label, real_label);
                 sum = sum + iou;
                 
-
             }
             total_predictions++;
         }

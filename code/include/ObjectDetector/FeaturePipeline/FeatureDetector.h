@@ -10,11 +10,14 @@ class DetectorType{
     public:
     enum class Type{
         SIFT,
-        ORB
+        ORB,
+        SURF
     };
 
     static std::vector<DetectorType::Type> getDetectorTypes() {
-        return { DetectorType::Type::SIFT, DetectorType::Type::ORB };
+        return { DetectorType::Type::SIFT, 
+            DetectorType::Type::ORB, 
+            DetectorType::Type::SURF};
     }
 
    
@@ -22,6 +25,7 @@ class DetectorType{
         switch (type) {
             case Type::SIFT: return "SIFT";
             case Type::ORB: return "ORB";
+            case Type::SURF: return "SURF";
             default: throw std::invalid_argument("Unknown detector type");
         }
     }

@@ -1,3 +1,5 @@
+#ifndef FEATURE_MATCHER_H
+#define FEATURE_MATCHER_H
 #include <opencv2/opencv.hpp>
 
 
@@ -49,3 +51,5 @@ class FeatureMatcher{
 
    
 };
+
+#endif

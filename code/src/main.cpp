@@ -41,7 +41,8 @@ int main(int argc, const char* argv[]){
 
         std::map<std::string, std::vector<Label>> predicted_items; 
         std::map<std::string, std::vector<Label>> real_items = obj_dataset.second.get_test_items();
-
+        
+        
         ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second);
         object_detector->detect_object_whole_dataset(ds, predicted_items);
         
