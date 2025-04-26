@@ -136,17 +136,17 @@ namespace Utils{
         void logDetection(
             const std::string& file_name,
             const std::string& obj_type,
-            const std::string& detector_type,
-            const std::string& matcher_type,
+            const std::string& method_name,
             double accuracy,
             double meanIoU);
 
         void printLabelsImg(
-                const Object_Type obj,    
-                const std::map<std::string,
-                std::vector<Label>>& predictedItems, 
-                const std::map<std::string, 
-                std::vector<Label>>& realItems);
+            const std::string& output_folder,
+            const Object_Type obj,    
+            const std::map<std::string,
+            std::vector<Label>>& predictedItems, 
+            const std::map<std::string, 
+            std::vector<Label>>& realItems);
     }
 
 

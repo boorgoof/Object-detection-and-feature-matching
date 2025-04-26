@@ -16,8 +16,8 @@ class DetectorType{
 
     static std::vector<DetectorType::Type> getDetectorTypes() {
         return { DetectorType::Type::SIFT, 
-            DetectorType::Type::ORB, 
-            DetectorType::Type::SURF};
+            /*DetectorType::Type::ORB, 
+            DetectorType::Type::SURF*/};
     }
 
    

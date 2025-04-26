@@ -8,10 +8,7 @@
 #include "../include/CustomErrors.h"
 
 
-void Utils::Logger::printLabelsImg(const Object_Type obj, const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems){
-
-
-    std::string output_folder = "../Output/BoundingBox/";
+void Utils::Logger::printLabelsImg(const std::string& output_folder, const Object_Type obj, const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems){
 
     if (!std::filesystem::exists(output_folder)) {
         std::filesystem::create_directories(output_folder); 
@@ -58,8 +55,7 @@ void Utils::Logger::printLabelsImg(const Object_Type obj, const std::map<std::st
 void Utils::Logger::logDetection(
     const std::string& file_name,
     const std::string& obj_type,
-    const std::string& detector_type,
-    const std::string& matcher_type,
+    const std::string& method_name,
     double accuracy,
     double meanIoU) {
         
@@ -70,11 +66,10 @@ void Utils::Logger::logDetection(
         return;
     }
 
-    log_file << "Objects detection pipeline: " << obj_type << "\n";
-    log_file << "FeatureDetector: " << detector_type << ", FeatureMatcher: " << matcher_type << "\n";
-    log_file << "Accuracy: " << accuracy << "\n";
-    log_file << "Mean IoU: " << meanIoU << "\n\n";
-
+    log_file <<  obj_type << ",";
+    log_file << method_name << ",";
+    log_file << accuracy << ",";
+    log_file << meanIoU << std::endl;
     
     log_file.close();
 }
