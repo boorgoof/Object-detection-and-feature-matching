@@ -1,0 +1,15 @@
+Objects detection pipeline: 004_sugar_box
+FeatureDetector: SIFT, FeatureMatcher: FLANN
+Accuracy: 0.8
+Mean IoU: 0.606401
+
+Objects detection pipeline: 006_mustard_bottle
+FeatureDetector: SIFT, FeatureMatcher: FLANN
+Accuracy: 0.3
+Mean IoU: 0.29338
+
+Objects detection pipeline: 035_power_drill
+FeatureDetector: SIFT, FeatureMatcher: FLANN
+Accuracy: 0.1
+Mean IoU: 0.12451
+

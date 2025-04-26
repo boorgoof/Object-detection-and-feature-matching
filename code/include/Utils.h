@@ -128,9 +128,26 @@ namespace Utils{
         double calculateIoU(const Label& predictedLabel, const Label& realLabel);
         double calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems);
         double calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems , double threshold = 0.5);
-        void printLabelsImg(const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems);
+        
     };
 
+    namespace Logger{
+
+        void logDetection(
+            const std::string& file_name,
+            const std::string& obj_type,
+            const std::string& detector_type,
+            const std::string& matcher_type,
+            double accuracy,
+            double meanIoU);
+
+        void printLabelsImg(
+                const Object_Type obj,    
+                const std::map<std::string,
+                std::vector<Label>>& predictedItems, 
+                const std::map<std::string, 
+                std::vector<Label>>& realItems);
+    }
 
 
 

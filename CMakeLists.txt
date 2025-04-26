@@ -12,6 +12,7 @@ add_executable(main code/src/main.cpp
     code/src/ObjectDetector/FeaturePipeline/FeatureDetector.cpp 
     code/src/ObjectDetector/FeaturePipeline/FeatureMatcher.cpp 
     code/src/DetectionAccuracy.cpp
+    code/src/Logger.cpp
     code/src/ObjectDetector/FeaturePipeline/ImageFilter.cpp)
 
 add_executable(main_image_generator 

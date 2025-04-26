@@ -79,7 +79,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const int minMatches= 10;
 
     if (matches.size() < minMatches) {
-        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
+        //std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
         return Label(object_type, cv::Rect());
     }
 
@@ -99,18 +99,12 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::Mat homography_mask;
     cv::Mat H = cv::findHomography(model_pts, scene_pts, cv::RANSAC, 5.0, homography_mask);
     if (H.empty()){
-        std::cout << "H empty" << std::endl;
+        //std::cout << "H empty" << std::endl;
         return Label(object_type, cv::Rect());
     }
-    std::cout << "H: " << H << std::endl;
+    // std::cout << "H: " << H << std::endl;
 
-    /*
-    std::vector<cv::Point2f> model_corners = {
-        {0, 0},
-        {static_cast<float>(cropped_imgModel.cols), 0},
-        {static_cast<float>(cropped_imgModel.cols), static_cast<float>(cropped_imgModel.rows)},
-        {0, static_cast<float>(cropped_imgModel.rows)}
-    };*/
+   
     cv::Rect mask_rect = cv::boundingRect(cropped_maskModel);
     std::vector<cv::Point2f> model_corners = {
         {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y)},
@@ -118,10 +112,10 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y + mask_rect.height)},
         {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y + mask_rect.height)}
     };
-
+    /*
     for( int i = 0; i < model_corners.size(); i++){
         std::cout << "model_corners[" << i << "]: " << model_corners[i] << std::endl;
-    }
+    }*/
 
     std::vector<cv::Point2f> scene_corners;     //corners of the detected object in the scene (not a horizontal/vertical rectangle, but commonly rotated)
     cv::perspectiveTransform(model_corners, scene_corners, H);
@@ -132,18 +126,20 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     scene_corners[2] = scene_corners[2] + model_corners[1] - model_corners[0];
     scene_corners[3] = scene_corners[3] + model_corners[1] - model_corners[0];
     */
+   
+    /*
     for( int i = 0; i < scene_corners.size(); i++){
         std::cout << "scene_corners[" << i << "]: " << scene_corners[i] << std::endl;
         
-    }
+    }*/
 
     std::vector<cv::Point2i> scene_corners_int;
     for( int i = 0; i < scene_corners.size(); i++){
         scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));
-        std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
+        //std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
         
     }
-
+    
     cv::Mat img_scene_copy = img_scene.clone();
 
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
