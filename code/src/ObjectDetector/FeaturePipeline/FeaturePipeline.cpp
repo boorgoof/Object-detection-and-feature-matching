@@ -1,189 +1,160 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
+#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
 
-/*
-1) trovi le feature di tutte le immagini in models
-2) per ogni immagine nel teste le confornti con quelle in models
-3) si prende il modello con piu match
-4) se il match viene considerato buono, viene localizzato in un bounding box
-
-*/
-
-const size_t FeaturePipeline::detect_objects(const cv::Mat& src_img, Object_Type object_type, std::vector<Label>& out_labels){
-    //add functionality using class members 
-    //cv::Ptr<cv::Feature2D> feature_detector
-    //cv::Ptr<cv::DescriptorMatcher> feature_matcher
-    
-    std::vector<cv::KeyPoint> src_keypoints;
-    cv::Mat src_desc;
-    this->detectFeatures(src_img,  cv::Mat(),  src_keypoints, src_desc); // in teoria con cv::Mat() non applica una maschera
-    //ritorna i keypoints e i descrittori dell'immagine di input
-
-    //feature matching passando keypoints e descrittori
-
-    std::pair<ModelFeatures, std::vector<cv::DMatch>> bestModel = selectBestModel(src_desc);
-  
-    ;
-    //-- Draw matches
-    //cv::Mat img_matches;
-    //cv::drawMatches(src_img, src_keypoints, bestModel.first.image, bestModel.first.keypoints, bestModel.second, img_matches );
-    //cv::imshow("Matches", img_matches);
-    //cv::waitKey(0);
-
-    out_labels.push_back(this->findBoundingBox(bestModel.second, 
-        src_keypoints, 
-        bestModel.first.keypoints, 
-        bestModel.first.image,
-        bestModel.first.mask,
-        src_img,
-        object_type));
-
-    return 0;
+void FeaturePipeline::init_models_features() {
+    this->models_features.clear();
+    this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features, this->model_imagefilter);
 }
 
-
-std::pair<ModelFeatures, std::vector<cv::DMatch>> FeaturePipeline::selectBestModel(const cv::Mat& query_descriptors) const {
-    
-    int best_model_idx = 0;
-    int best_score = 0;
-    std::vector<cv::DMatch> good_matches;
-
-    for (size_t i = 0; i < models_features.size(); ++i) {
-        good_matches.clear();
-
-        const auto& model = models_features[i];
-        if (model.descriptors.empty()) 
-            std::cout << "Errore models_features is not initialized correctly";
-
-        std::vector<cv::DMatch> matches;
-        this->matchFeatures(query_descriptors, model.descriptors, matches);
-        
-        std::sort(matches.begin(), matches.end(), [](const cv::DMatch& a, const cv::DMatch& b) {return a.distance < b.distance;});
-
-        
-        for (size_t j = 0; j < matches.size(); ++j) {
-            //std::cout << matches[j].distance << std::endl;
-            if (matches[j].distance < 130.0f) {
-                good_matches.push_back(matches[j]);
-            }
-        }
-        //std::cout << good_matches.size() << std::endl;
-
-        int score = good_matches.size();
-
-        if (score > best_score) {
-            //std::cout << "changing score and index" << std::endl;
-            best_score = score;
-            best_model_idx = i;
-            //std::cout << "best model index: " << best_model_idx << std::endl;
-            //std::cout << "best score: " << best_score << std::endl;
-        }
-        //std::cout << "i: " << i << std::endl;
+void FeaturePipeline::update_detector_matcher_compatibility() {
+    if (this->detector->getType() == DetectorType::Type::ORB && this->matcher->getType() == MatcherType::Type::FLANN) {
+        delete this->matcher;
+        this->matcher = new FeatureMatcher(MatcherType::Type::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2)));
     }
-    std::cout << best_model_idx << std::endl;
-    std::cout << best_score << std::endl;
-
-
-    return { models_features[best_model_idx], good_matches };
 }
 
+FeaturePipeline::~FeaturePipeline() {
+    delete this->detector;
+    delete this->matcher;
+    delete this->model_imagefilter;
+    delete this->test_imagefilter;
+}
 
-void FeaturePipeline::setModelsfeatures(const Dataset dataset) {
-    
-    const std::vector<std::pair<std::string, std::string>>& model_pairs = dataset.get_models();
+void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) {
 
-    for (const auto& model_pair : model_pairs) {
+    out_labels.clear();
 
-        cv::Mat img = cv::imread(model_pair.first, cv::IMREAD_COLOR);
-        cv::Mat mask = cv::imread(model_pair.second, cv::IMREAD_GRAYSCALE);
+    //models' features are already detected and stored in the pipeline (they always remain the same for every test image, so they are detected only once)
 
-        if (img.empty() || mask.empty()){
-            std::cout<<"errore train o mask non caricati";
-        }
-
-        std::vector<cv::KeyPoint> keypoints;
-        cv::Mat descriptors;
-        this->detectFeatures(img, mask, keypoints, descriptors);
-
-        ModelFeatures model{
-            dataset.get_type(),           
-            model_pair.first,             
-            img,
-            mask,
-            keypoints,
-            descriptors
-        };
-
-        this->models_features.push_back(model);
-
+    cv::Mat src_img_filtered = src_img.clone();
+    //test image filtering if the filter component is present
+    if (this->test_imagefilter != nullptr) {
+        src_img_filtered = this->test_imagefilter->apply_filters(src_img);
     }
 
+    //detects test image features
+    SceneFeatures src_features;
+    this->detector->detectFeatures(src_img_filtered, src_features.keypoints, src_features.descriptors);
+    
+    //matches test image features with every models' features and store them in out_matches
+    std::vector<std::vector<cv::DMatch>> out_matches;
+    for(ModelFeatures model_features : this->models_features){
+        std::vector<cv::DMatch> out_matches_t;
+        this->matcher->matchFeatures(model_features.descriptors, src_features.descriptors, out_matches_t);
+        out_matches.push_back(out_matches_t);
+    }
+
+    //finds the best model (the one with the most matches)
+    int best_model_idx = -1;
+    size_t best_score = 0;
+    for (size_t i = 0; i < out_matches.size(); ++i) {
+        if (out_matches[i].size() > best_score) {
+            best_score = out_matches[i].size();
+            best_model_idx = static_cast<int>(i);
+        }
+    }
+
+    if(best_model_idx == -1){
+        std::cout << "detect object: Nessun modello trovato" << std::endl; // eliminare solo il cout
+        return;
+    }
+    //calculates bounding box of the object found in the test image
+    cv::Mat imgModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].first);
+    cv::Mat maskModel = Utils::Loader::load_image(this->dataset.get_models()[best_model_idx].second);
+    Label labelObj = findBoundingBox(out_matches[best_model_idx],  this->models_features[best_model_idx].keypoints, src_features.keypoints, imgModel,  maskModel, src_img_filtered, this->dataset.get_type());
+    
+    out_labels.push_back(labelObj);
 }
+
 
 
 Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
-    const std::vector<cv::KeyPoint>& query_keypoint,
     const std::vector<cv::KeyPoint>& model_keypoint,
-    const cv::Mat& imgModel,
-    const cv::Mat& maskModel,
-    const cv::Mat& imgQuery,
+    const std::vector<cv::KeyPoint>& scene_keypoint,
+    const cv::Mat& img_model,
+    const cv::Mat& mask_model,
+    const cv::Mat& img_scene,
     Object_Type object_type) const 
 {
-    const int minMatches= 10;
-
-    std::cout << "matches: " << matches.size() << std::endl;
+    const int minMatches = 4;
 
     if (matches.size() < minMatches) {
-        std::cerr << "not enough matches " << matches.size() << ". Min: " << minMatches << std::endl;
+        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
         return Label(object_type, cv::Rect());
     }
 
-    std::vector<cv::Point2f> query_pts, model_pts;
+    cv::Mat cropped_imgModel = img_model(cv::boundingRect(mask_model)); // crop the image to remove the white background of the mask
+    cv::Mat cropped_maskModel = mask_model(cv::boundingRect(mask_model)); // crop the mask to remove the white background of the mask
 
+    //cv::Mat cropped_imgModel = img_model.clone();   //just to avoid changing the names on the next varaibles, in the definitive version I will change the names
+    //cv::Mat cropped_maskModel = mask_model.clone();
+
+    std::vector<cv::Point2f> scene_pts, model_pts;
     for (const auto& match : matches) {
-        query_pts.push_back(query_keypoint[match.queryIdx].pt);
-        model_pts.push_back(model_keypoint[match.trainIdx].pt);
+        model_pts.push_back(model_keypoint[match.queryIdx].pt);
+        scene_pts.push_back(scene_keypoint[match.trainIdx].pt);
     }
+    
+    
+    cv::Mat homography_mask;
+    cv::Mat H = cv::findHomography(model_pts, scene_pts, cv::RANSAC, 5.0, homography_mask);
+    if (H.empty()){
+        std::cout << "H empty" << std::endl;
+        return Label(object_type, cv::Rect());
+    }
+    
 
-    //cv::Mat mask;
-    cv::Mat H = cv::findHomography(model_pts, query_pts, cv::RANSAC, 5.0);
-    if (H.empty())
-        return Label(object_type, cv::Rect());      //throw error and catch it
-
-    cv::Rect model_rect = cv::boundingRect(maskModel); // rettangolo piu piccolo di dei pixel che non sono zero
-
+    cv::Rect mask_rect = cv::boundingRect(cropped_maskModel);
     std::vector<cv::Point2f> model_corners = {
-
-        {(model_rect.x), (model_rect.y)},
-        {(model_rect.x + model_rect.width), (model_rect.y)},
-        {(model_rect.x + model_rect.width), (model_rect.y + model_rect.height)},
-        {(model_rect.x), (model_rect.y + model_rect.height)}
-
+        {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y)},
+        {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y)},
+        {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y + mask_rect.height)},
+        {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y + mask_rect.height)}
     };
+    /*
+    for( int i = 0; i < model_corners.size(); i++){
+        std::cout << "model_corners[" << i << "]: " << model_corners[i] << std::endl;
+    }*/
 
-    std::vector<cv::Point2f> scene_corners;
+    std::vector<cv::Point2f> scene_corners;     //corners of the detected object in the scene (not a horizontal/vertical rectangle, but commonly rotated)
     cv::perspectiveTransform(model_corners, scene_corners, H);
+    
+    
+    std::vector<cv::Point2i> scene_corners_int;
+    for( int i = 0; i < scene_corners.size(); i++){
+        scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));
+        //std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
+        
+    }
+    
+    cv::Mat img_scene_copy = img_scene.clone();
 
-    cv::Rect boundingBox = cv::boundingRect(scene_corners);
-    cv::rectangle(imgQuery, boundingBox, cv::Scalar(0,255,0), 2); // Disegna un rettangolo
-    cv::imshow("imgQuery", imgQuery);
+    cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
+
+    cv::polylines(img_scene_copy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
+    cv::rectangle(img_scene_copy, sceneBB, cv::Scalar(0, 255, 0), 5);                      //GREEN draw the bounding box (axis-aligned rectangle) on the image
+
+    
+    cv::imshow("test image /w bounding box", img_scene_copy);
+    
+    cv::Mat imgSceneMatches = img_scene.clone();
+    cv::drawMatches( 
+        cropped_imgModel,
+        model_keypoint,
+        img_scene,
+        scene_keypoint,
+        matches,
+        imgSceneMatches,
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255),
+        homography_mask
+        );
+    
+
+    cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
-    return Label(object_type, boundingBox);
+
+    return Label(object_type, sceneBB);
 }
 
 
-
-void FeaturePipeline::detectFeatures(const cv::Mat& img, const cv::Mat& mask, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const {
-    feature_detector->detectAndCompute(img, mask, keypoints, descriptors);
-}
-
-void FeaturePipeline::matchFeatures(const cv::Mat& queryDescriptors,const cv::Mat& trainDescriptors, std::vector<cv::DMatch>& matches) const {
-    feature_matcher->match(queryDescriptors, trainDescriptors, matches);
-}
-
-void FeaturePipeline::setFeatureDetector(const cv::Ptr<cv::Feature2D>& features_detector) {
-    this->feature_detector = features_detector;
-}
-
-void FeaturePipeline::setFeatureMatcher(const cv::Ptr<cv::DescriptorMatcher>& features_matcher) {
-    this->feature_matcher = features_matcher;
-}

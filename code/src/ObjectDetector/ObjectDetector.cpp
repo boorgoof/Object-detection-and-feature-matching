@@ -3,20 +3,15 @@
 
 ObjectDetector::~ObjectDetector() {}
 
-const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset, std::vector<std::vector<Label>>& out_labels){
+const size_t ObjectDetector::detect_object_whole_dataset(const Dataset& dataset, std::map<std::string, std::vector<Label>>& predicted_items){
     
-    out_labels.clear();
+    predicted_items.clear();
     
-    const std::vector<std::pair<std::vector<Label>, std::string>>& test_data = dataset.get_items();
+    const std::map<std::string, std::vector<Label>>& test_data = dataset.get_test_items();
 
-    for(auto it=test_data.begin(); it != test_data.end(); ++it){
-        const cv::Mat img = Utils::Loader::load_image(it->second);
+    for(auto test_item : test_data){
+        this->detect_objects(Utils::Loader::load_image(test_item.first), predicted_items[test_item.first]);
+    };
 
-        std::vector<Label> img_detections;
-        this->detect_objects(img, dataset.get_type(),  img_detections);
-
-        out_labels.push_back(img_detections);
-    }
-
-    return out_labels.size();
+    return predicted_items.size();
 }
