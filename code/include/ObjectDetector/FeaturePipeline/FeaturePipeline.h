@@ -13,21 +13,19 @@ class ImageFilter;
 /**
  * @brief FeaturePipeline class to detect objects in images using feature detection and matching.
  *        This class implements the ObjectDetector interface.
- * 
  */
 class FeaturePipeline : public ObjectDetector {
 
     private:
-       /**
+        /**
         * @brief FeatureDetector pointer to the feature detector used by the pipeline.
         */
         FeatureDetector* detector;
-
         /**
          * @brief FeatureMatcher pointer to the feature matcher used by the pipeline.
          */
         FeatureMatcher* matcher;
-
+    
         /**
          * @brief ImageFilter pointer to the image filter used by the pipeline.
          */
@@ -41,9 +39,13 @@ class FeaturePipeline : public ObjectDetector {
          * @brief Dataset reference to the dataset used by the pipeline.
          */
         Dataset& dataset;
-        std::vector<ModelFeatures> models_features;
 
         /**
+         * @brief ector of ModelFeatures to store the features of the all the dataset's models.
+         */
+        std::vector<ModelFeatures> models_features;
+
+         /**
          * @brief method to initialize all the models' features.
          */
         void init_models_features();
@@ -77,7 +79,7 @@ class FeaturePipeline : public ObjectDetector {
         const Dataset& getDataset() const {
             return this->dataset;
         }
-    
+        
         /**
          * @brief method to detect objects in the scene image.
          * @param src_img the scene (test) image

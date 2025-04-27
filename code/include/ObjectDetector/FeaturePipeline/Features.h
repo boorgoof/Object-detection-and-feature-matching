@@ -18,7 +18,7 @@ struct ModelFeatures {
      * @brief keypoints of the model
      */
     std::vector<cv::KeyPoint> keypoints;
-    
+
     /**
      * @brief descriptors of the model
      */
@@ -31,6 +31,10 @@ struct ModelFeatures {
     : dataset_models_idx(-1), keypoints(), descriptors() {}
 };
 
+
+/**
+ * @brief SceneFeatures struct to store the features of a scene image
+ */
 struct SceneFeatures {
 
     /**
