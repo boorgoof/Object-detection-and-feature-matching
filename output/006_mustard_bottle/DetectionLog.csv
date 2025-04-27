@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 006_mustard_bottle,SIFT-FLANN-ModelFilter-TestFilter,0.5,0.457974
 006_mustard_bottle,SIFT-FLANN,0.4,0.431419
+=======
+006_mustard_bottle,SIFT-FLANN,0.5,0.420439
+>>>>>>> f9547e142a176283aa34021dc55e82ad0791015a

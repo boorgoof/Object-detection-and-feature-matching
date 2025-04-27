@@ -107,9 +107,6 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::Mat cropped_imgModel = img_model(cv::boundingRect(mask_model)); // crop the image to remove the white background of the mask
     cv::Mat cropped_maskModel = mask_model(cv::boundingRect(mask_model)); // crop the mask to remove the white background of the mask
 
-    //cv::Mat cropped_imgModel = img_model.clone();   //just to avoid changing the names on the next varaibles, in the definitive version I will change the names
-    //cv::Mat cropped_maskModel = mask_model.clone();
-
     std::vector<cv::Point2f> scene_pts, model_pts;
     for (const auto& match : matches) {
         model_pts.push_back(model_keypoint[match.queryIdx].pt);
@@ -132,20 +129,14 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         {static_cast<float>(mask_rect.x + mask_rect.width), static_cast<float>(mask_rect.y + mask_rect.height)},
         {static_cast<float>(mask_rect.x), static_cast<float>(mask_rect.y + mask_rect.height)}
     };
-    /*
-    for( int i = 0; i < model_corners.size(); i++){
-        std::cout << "model_corners[" << i << "]: " << model_corners[i] << std::endl;
-    }*/
-
+    
     std::vector<cv::Point2f> scene_corners;     //corners of the detected object in the scene (not a horizontal/vertical rectangle, but commonly rotated)
     cv::perspectiveTransform(model_corners, scene_corners, H);
     
     
     std::vector<cv::Point2i> scene_corners_int;
     for( int i = 0; i < scene_corners.size(); i++){
-        scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));
-        //std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
-        
+        scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));      
     }
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
     /*

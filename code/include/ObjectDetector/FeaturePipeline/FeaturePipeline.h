@@ -12,7 +12,7 @@ class ImageFilter;
 
 /**
  * @brief FeaturePipeline class to detect objects in images using feature detection and matching.
- *        This class implements the ObjectDetector interface.
+ *        The class derives from the abstract class ObjectDetector.
  */
 class FeaturePipeline : public ObjectDetector {
 
