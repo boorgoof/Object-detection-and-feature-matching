@@ -19,7 +19,7 @@ Task:
 
 # Report
 
-DetectObject is an abstract class that generally defines the ability of a class to identify an object from an image, returning a Label. A Label DetectObject is an abstract class that generally defines the ability of a class to identify an object from an image, returning a Label. A Label specifies the type of the returned object and the corresponding bounding box in the reference image.
+ObjectDetector is an abstract class that generally defines the ability of a class to identify an object from an image, returning a Label. A Label specifies the type of the returned object and the corresponding bounding box in the reference image.
 
 So two classes have been defined that, by extending the Object detector, try to solve the problem of identifying an object with different approaches. 
 Specifically, the implemented classes are FeaturePipeline and ViolaAndJones.
