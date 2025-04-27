@@ -1,1 +1,5 @@
+<<<<<<< HEAD
+006_mustard_bottle,SIFT-FLANN,0.7,0.480778
+=======
 006_mustard_bottle,SIFT-FLANN,0.5,0.420439
+>>>>>>> 6f212b4da9fe26c31925bcff34be3e6f73dc4834
