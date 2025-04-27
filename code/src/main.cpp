@@ -5,7 +5,7 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
-#include "../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+#include "../include/ImageFilter.h"
 #include "../include/CustomErrors.h"
 #include <filesystem>
 
@@ -20,12 +20,13 @@ int main(int argc, const char* argv[]){
     }
     if(argc >= 3){
         output_path = argv[2];
-        if (!std::filesystem::exists(output_path)) {
-            std::filesystem::create_directories(output_path); 
-        }
     }
     else{
         std::cout << "NO COMMAND LINE PARAMETERS, USING DEFAULT" << std::endl;
+    }
+
+    if (!std::filesystem::exists(output_path)) {
+        std::filesystem::create_directories(output_path); 
     }
 
     std::cout << "DATASET PATH: " << dataset_path << std::endl;

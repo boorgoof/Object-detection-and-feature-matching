@@ -13,17 +13,19 @@ add_executable(main code/src/main.cpp
     code/src/ObjectDetector/FeaturePipeline/FeatureMatcher.cpp 
     code/src/DetectionAccuracy.cpp
     code/src/Logger.cpp
-    code/src/ObjectDetector/FeaturePipeline/ImageFilter.cpp)
+    code/src/ImageFilter.cpp)
 
 add_executable(main_image_generator 
     code/src/MainGenerator.cpp 
     code/src/ImageDatasetGenerator.cpp 
-    code/src/Utils.cpp code/src/Label.cpp)
+    code/src/Utils.cpp
+    code/src/Label.cpp)
 
-    add_executable(main_Viola_Jones
+add_executable(main_Viola_Jones
     code/src/MainViolaJones.cpp 
     code/src/ViolaJonesTraining.cpp 
-    code/src/Utils.cpp code/src/Label.cpp)
+    code/src/Utils.cpp
+    code/src/Label.cpp)
 
 target_link_libraries(main ${OpenCV_LIBS})
 target_link_libraries(main_image_generator ${OpenCV_LIBS})

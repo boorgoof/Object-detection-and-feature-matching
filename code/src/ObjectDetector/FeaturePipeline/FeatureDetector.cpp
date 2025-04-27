@@ -1,7 +1,7 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeatureDetector.h"
 #include "../../../include/CustomErrors.h"
 #include "../../../include/Utils.h"
-#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+#include "../../../include/ImageFilter.h"
 
 void FeatureDetector::init(){
     switch (this->type) {

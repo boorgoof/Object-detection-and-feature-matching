@@ -1,5 +1,5 @@
-#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
-#include "../../../include/CustomErrors.h"
+#include "../include/ImageFilter.h"
+#include "../include/CustomErrors.h"
 
 cv::Mat ImageFilter::apply_filters(const cv::Mat& src_img){
     cv::Mat filtered_img = src_img.clone();

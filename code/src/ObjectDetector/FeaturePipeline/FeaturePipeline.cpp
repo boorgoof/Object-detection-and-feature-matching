@@ -1,5 +1,5 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
-#include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+#include "../../../include/ImageFilter.h"
 #include "../../../include/CustomErrors.h"
 
 void FeaturePipeline::init_models_features() {
