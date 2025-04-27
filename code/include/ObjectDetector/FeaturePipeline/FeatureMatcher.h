@@ -39,6 +39,12 @@ class FeatureMatcher{
     FeatureMatcher(const MatcherType::Type& type) : type{type} {this->init();}
     FeatureMatcher(const MatcherType::Type& type, cv::DescriptorMatcher* matcher) : type{type}, features_matcher{cv::Ptr<cv::DescriptorMatcher>(matcher)} {}
 
+    /**
+     * @brief method to match features between two images (the model and the scene)
+     * @param modelDescriptors the descriptors of the model image
+     * @param sceneDescriptors the descriptors of the scene image
+     * @param matches the output vector of matches between the two input images
+     */
     void matchFeatures(const cv::Mat& modelDescriptors, const cv::Mat& sceneDescriptors, std::vector<cv::DMatch>& matches) const;
     
     void updateMatcher(cv::Ptr<cv::DescriptorMatcher> new_matcher) {
