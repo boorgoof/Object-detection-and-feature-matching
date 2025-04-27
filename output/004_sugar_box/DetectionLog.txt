@@ -1,1 +1,0 @@
-004_sugar_box,SIFT-FLANN,0.9,0.671773

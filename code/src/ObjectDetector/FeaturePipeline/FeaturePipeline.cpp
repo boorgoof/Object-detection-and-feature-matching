@@ -1,5 +1,6 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
 #include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
+#include "../../../include/CustomErrors.h"
 
 void FeaturePipeline::init_models_features() {
     this->models_features.clear();
@@ -20,7 +21,20 @@ FeaturePipeline::~FeaturePipeline() {
     delete this->test_imagefilter;
 }
 
-void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) {
+FeaturePipeline::FeaturePipeline(FeatureDetector *fd, FeatureMatcher *fm, Dataset &dataset, ImageFilter *model_imagefilter, ImageFilter *test_imagefilter)
+    : detector{fd}, matcher{fm}, dataset{dataset} {
+    this->model_imagefilter = model_imagefilter;
+    this->test_imagefilter = test_imagefilter;
+    this->update_detector_matcher_compatibility();
+    this->init_models_features();
+    std::string filter_name = "";
+    if (this->model_imagefilter != nullptr) filter_name += "-ModelFilter";
+    if (this->test_imagefilter != nullptr) filter_name += "-TestFilter";
+    std::string method_name = DetectorType::toString(fd->getType()) + "-" + MatcherType::toString(fm->getType()) + filter_name;
+    this->set_method(method_name);
+}
+void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels)
+{
 
     out_labels.clear();
 
@@ -38,9 +52,18 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     
     //matches test image features with every models' features and store them in out_matches
     std::vector<std::vector<cv::DMatch>> out_matches;
+    int c = 0;
     for(ModelFeatures model_features : this->models_features){
         std::vector<cv::DMatch> out_matches_t;
-        this->matcher->matchFeatures(model_features.descriptors, src_features.descriptors, out_matches_t);
+
+        try{
+            this->matcher->matchFeatures(model_features.descriptors, src_features.descriptors, out_matches_t);
+        }
+        catch (const CustomErrors::InvalidArgumentError& e) {
+            std::cerr << "Warning: Error in matching features: " << e.what() << std::endl;
+            c++;
+            continue; // Skip this model and continue with the next one
+        }
         out_matches.push_back(out_matches_t);
     }
 
@@ -55,7 +78,7 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     }
 
     if(best_model_idx == -1){
-        std::cout << "detect object: Nessun modello trovato" << std::endl; // eliminare solo il cout
+        std::cerr << "Warning: no suitable model found" << std::endl;
         return;
     }
     //calculates bounding box of the object found in the test image
@@ -65,8 +88,6 @@ void FeaturePipeline::detect_objects(const cv::Mat& src_img, std::vector<Label>&
     
     out_labels.push_back(labelObj);
 }
-
-
 
 Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const std::vector<cv::KeyPoint>& model_keypoint,
@@ -79,7 +100,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     const int minMatches = 4;
 
     if (matches.size() < minMatches) {
-        std::cout << "Not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
+        std::cout << "Warning: not enough matches are found - " << matches.size() << "/" << minMatches << std::endl;
         return Label(object_type, cv::Rect());
     }
 
@@ -99,7 +120,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::Mat homography_mask;
     cv::Mat H = cv::findHomography(model_pts, scene_pts, cv::RANSAC, 5.0, homography_mask);
     if (H.empty()){
-        std::cout << "H empty" << std::endl;
+        std::cerr << "Warning: homography matrix empty" << std::endl;
         return Label(object_type, cv::Rect());
     }
     
@@ -126,17 +147,12 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         //std::cout << "scene_corners int[" << i << "]: " << scene_corners_int[i] << std::endl;
         
     }
-    
-    cv::Mat img_scene_copy = img_scene.clone();
-
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
-
+    /*
+    cv::Mat img_scene_copy = img_scene.clone();
     cv::polylines(img_scene_copy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
     cv::rectangle(img_scene_copy, sceneBB, cv::Scalar(0, 255, 0), 5);                      //GREEN draw the bounding box (axis-aligned rectangle) on the image
-
-    
     cv::imshow("test image /w bounding box", img_scene_copy);
-    
     cv::Mat imgSceneMatches = img_scene.clone();
     cv::drawMatches( 
         cropped_imgModel,
@@ -149,11 +165,9 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         cv::Scalar(0, 0, 255),
         homography_mask
         );
-    
-
     cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
-
+    */
     return Label(object_type, sceneBB);
 }
 

@@ -57,8 +57,7 @@ class FeaturePipeline : public ObjectDetector {
 
     public:
 
-        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset, ImageFilter* model_imagefilter = nullptr, ImageFilter* test_imagefilter = nullptr)
-            : detector{fd}, matcher{fm}, dataset{dataset}, ObjectDetector{DetectorType::toString(fd->getType())+"-"+MatcherType::toString(fm->getType())} { this->model_imagefilter = model_imagefilter; this->test_imagefilter = test_imagefilter; this->update_detector_matcher_compatibility(); this->init_models_features();}
+        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset, ImageFilter* model_imagefilter = nullptr, ImageFilter* test_imagefilter = nullptr);
         ~FeaturePipeline();
 
         void addDetectorComponent(FeatureDetector* fd) {

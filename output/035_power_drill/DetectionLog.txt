@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-035_power_drill,SIFT-FLANN,0.1,0.109822
-=======
-035_power_drill,SIFT-FLANN,0.2,0.182398
->>>>>>> 6f212b4da9fe26c31925bcff34be3e6f73dc4834

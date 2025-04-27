@@ -12,7 +12,7 @@
  */
 class ObjectDetector{
     public:
-    ObjectDetector(const std::string& method) : method(method) {};
+    ObjectDetector() = default;
     ObjectDetector(const ObjectDetector&) = delete;
     ObjectDetector(ObjectDetector&&) = delete;
     ObjectDetector& operator=(const ObjectDetector&) = delete;
@@ -35,6 +35,7 @@ class ObjectDetector{
     const size_t detect_object_whole_dataset(const Dataset& dataset, std::map<std::string, std::vector<Label>>& predicted_items);
 
     const std::string& get_method() const { return this->method; }
+    void set_method(const std::string& method) { this->method = method; }
     private:
     std::string method;
 };
