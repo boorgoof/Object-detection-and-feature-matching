@@ -2,7 +2,6 @@
 #include "../../../include/CustomErrors.h"
 #include "../../../include/Utils.h"
 #include "../../../include/ObjectDetector/FeaturePipeline/ImageFilter.h"
-//#include <opencv2/xfeatures2d.hpp>    // CHECK IF IN THE VLAB THIS LIBRARY IS INSTALLED
 
 void FeatureDetector::init(){
     switch (this->type) {
@@ -12,11 +11,6 @@ void FeatureDetector::init(){
         case DetectorType::Type::ORB:
             this->features_detector = cv::ORB::create();
             break;
-            /*                          // CHECK IF IN THE VLAB THIS LIBRARY IS INSTALLED          
-        case DetectorType::Type::SURF:
-            this->features_detector = cv::xfeatures2d::SURF::create();
-            break;
-            */
         default:
             throw CustomErrors::InvalidArgumentError("type", "Invalid feature detector type");
     }

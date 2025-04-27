@@ -3,16 +3,20 @@
 
 #include <opencv2/opencv.hpp>
 
-
+/**
+ * @brief Class to represent the type of a matcher (e.g. FLANN, BRUTEFORCE).
+ */
 class MatcherType{
 
     public:
 
+    /**
+     * @brief enum to represent the different types of matchers.
+     */
     enum class Type{
         FLANN,
         BRUTEFORCE
     };
-    
 
     static std::vector<MatcherType::Type> getMatcherTypes() {
         return { MatcherType::Type::FLANN, /*MatcherType::Type::BRUTEFORCE*/ };
@@ -28,14 +32,24 @@ class MatcherType{
     }
        
     private:
+    /**
+     * @brief the type of the matcher
+     */
     Type type;
 
 };
 class FeatureMatcher{
     private:
-    cv::Ptr<cv::DescriptorMatcher> features_matcher;
+    /**
+     * @brief the type of the matcher
+     */
     MatcherType::Type type;
+    /**
+     * @brief the OpenCV feature matcher
+     */
+    cv::Ptr<cv::DescriptorMatcher> features_matcher;
     void init();
+
     public:
     FeatureMatcher(const MatcherType::Type& type) : type{type} {this->init();}
     FeatureMatcher(const MatcherType::Type& type, cv::DescriptorMatcher* matcher) : type{type}, features_matcher{cv::Ptr<cv::DescriptorMatcher>(matcher)} {}

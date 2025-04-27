@@ -5,19 +5,24 @@
 #include "Features.h"
 class ImageFilter;
 
+/**
+ * @brief Class to represent the type of a detector (e.g. SIFT, ORB, SURF).
+ */
 class DetectorType{
 
     public:
+
+    /**
+     * @brief enum to represent the different types of detectors.
+     */
     enum class Type{
         SIFT,
-        ORB,
-        SURF
+        ORB
     };
 
     static std::vector<DetectorType::Type> getDetectorTypes() {
         return { DetectorType::Type::SIFT, 
-            /*DetectorType::Type::ORB, 
-            DetectorType::Type::SURF*/};
+            /*DetectorType::Type::ORB*/};
     }
 
    
@@ -25,12 +30,14 @@ class DetectorType{
         switch (type) {
             case Type::SIFT: return "SIFT";
             case Type::ORB: return "ORB";
-            case Type::SURF: return "SURF";
             default: throw std::invalid_argument("Unknown detector type");
         }
     }
            
     private:
+    /**
+     * @brief the type of the detector
+     */
     Type type;
 
 };
@@ -38,7 +45,14 @@ class DetectorType{
 class FeatureDetector{
 
     private:
+    /**
+     * @brief the type of the detector
+     */
     DetectorType::Type type;
+
+    /**
+     * @brief the OpenCV feature detector
+     */
     cv::Ptr<cv::Feature2D> features_detector;
 
     void init();
