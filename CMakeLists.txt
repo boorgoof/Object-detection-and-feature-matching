@@ -18,6 +18,7 @@ add_executable(main code/src/main.cpp
 add_executable(main_image_generator 
     code/src/MainGenerator.cpp 
     code/src/ImageDatasetGenerator.cpp 
+    code/src/ViolaJonesTraining.cpp 
     code/src/Utils.cpp
     code/src/Label.cpp)
 
