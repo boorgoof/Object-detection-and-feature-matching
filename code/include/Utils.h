@@ -156,12 +156,12 @@ namespace Utils{
     };
 
     /**
-     * @brief functions to log the detection results.
+     * @brief functions to log the detection results
      */
     namespace Logger{
 
         /**
-         * @brief function to log the detection results in a .cvs file:  Object_Type, FeatureDetector-FeatureMatcher, Accuracy, MeanIoU
+         * @brief function to log the detection results in a .cvs file:  Object_Type, FeatureDetector-FeatureMatcher, Accuracy, MeanIoU.
          * @param file_name the name of the file
          * @param obj_type the object type
          * @param method_name the name of the detector and matcher
@@ -176,7 +176,7 @@ namespace Utils{
             double meanIoU);
 
         /**
-         * @brief function to print the predicted and real labels of the  objects in the scene (test) image.
+         * @brief function to print the predicted and real labels of the  objects in the scene image.
          * @param output_folder the folder to save the images
          * @param obj the object type
          * @param predictedItems the predicted items
