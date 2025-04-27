@@ -54,7 +54,6 @@ double Utils::DetectionAccuracy::calculateMeanIoU(const Object_Type obj, std::ma
                 double iou = Utils::DetectionAccuracy::calculateIoU(predicted_label, real_label);
                 sum = sum + iou;
                 
-
             }
             total_predictions++;
         }
@@ -80,6 +79,7 @@ double Utils::DetectionAccuracy::calculateDatasetAccuracy(const Object_Type obj,
         
         // if the file isn't in the predicted map, skip it
         if(predictedItems.find(filename) == predictedItems.end()){
+            std::cout << "File not found in predicted items during accuracy: " << filename << std::endl;
             continue;
         }
 

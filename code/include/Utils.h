@@ -125,12 +125,29 @@ namespace Utils{
      * @brief Detection accuracy functions.
      */
     namespace DetectionAccuracy{
-
         double calculateIoU(const Label& predictedLabel, const Label& realLabel);
         double calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems);
         double calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems , double threshold = 0.5);
+        
     };
 
+    namespace Logger{
+
+        void logDetection(
+            const std::string& file_name,
+            const std::string& obj_type,
+            const std::string& method_name,
+            double accuracy,
+            double meanIoU);
+
+        void printLabelsImg(
+            const std::string& output_folder,
+            const Object_Type obj,    
+            const std::map<std::string,
+            std::vector<Label>>& predictedItems, 
+            const std::map<std::string, 
+            std::vector<Label>>& realItems);
+    }
 
 
 
