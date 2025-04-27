@@ -125,14 +125,49 @@ namespace Utils{
      * @brief Detection accuracy functions.
      */
     namespace DetectionAccuracy{
+
+        /**
+         * @brief function to calculate the Intersection over Union (IoU) between two labels.
+         * @param predictedLabel the predicted label
+         * @param realLabel the real label
+         * @return the IoU value
+         */
         double calculateIoU(const Label& predictedLabel, const Label& realLabel);
+
+        /**
+         * @brief function to calculate the mean IoU for a particular object type which has been identified.
+         * @param obj the object type
+         * @param realItems the real items 
+         * @param predictedItems the predicted items
+         * @return the mean IoU value
+         */
         double calculateMeanIoU(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems);
+
+        /**
+         * @brief function to calculate the accuracy of a dataset.
+         * @param obj the object type
+         * @param realItems the real items 
+         * @param predictedItems the predicted items
+         * @param threshold the threshold for the IoU value to consider a detection as correct
+         * @return the accuracy value
+         */
         double calculateDatasetAccuracy(const Object_Type obj, std::map<std::string, std::vector<Label>>& realItems, const std::map<std::string, std::vector<Label>>& predictedItems , double threshold = 0.5);
         
     };
 
+    /**
+     * @brief functions to log the detection results
+     */
     namespace Logger{
 
+        /**
+         * @brief function to log the detection results in a .cvs file:  Object_Type, FeatureDetector-FeatureMatcher, Accuracy, MeanIoU.
+         * @param file_name the name of the file
+         * @param obj_type the object type
+         * @param method_name the name of the detector and matcher
+         * @param accuracy the accuracy value
+         * @param meanIoU the mean IoU value
+         */
         void logDetection(
             const std::string& file_name,
             const std::string& obj_type,
@@ -140,6 +175,13 @@ namespace Utils{
             double accuracy,
             double meanIoU);
 
+        /**
+         * @brief function to print the predicted and real labels of the  objects in the scene image.
+         * @param output_folder the folder to save the images
+         * @param obj the object type
+         * @param predictedItems the predicted items
+         * @param realItems the real items  
+         */
         void printLabelsImg(
             const std::string& output_folder,
             const Object_Type obj,    

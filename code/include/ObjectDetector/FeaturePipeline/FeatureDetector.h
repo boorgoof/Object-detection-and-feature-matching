@@ -5,19 +5,24 @@
 #include "Features.h"
 class ImageFilter;
 
+/**
+ * @brief Class to represent the type of a detector (e.g. SIFT, ORB, SURF).
+ */
 class DetectorType{
 
     public:
+
+    /**
+     * @brief enum to represent the different types of detectors.
+     */
     enum class Type{
         SIFT,
-        ORB,
-        SURF
+        ORB
     };
 
     static std::vector<DetectorType::Type> getDetectorTypes() {
         return { DetectorType::Type::SIFT, 
-            /*DetectorType::Type::ORB, 
-            DetectorType::Type::SURF*/};
+            /*DetectorType::Type::ORB*/};
     }
 
    
@@ -25,12 +30,14 @@ class DetectorType{
         switch (type) {
             case Type::SIFT: return "SIFT";
             case Type::ORB: return "ORB";
-            case Type::SURF: return "SURF";
             default: throw std::invalid_argument("Unknown detector type");
         }
     }
            
     private:
+    /**
+     * @brief the type of the detector
+     */
     Type type;
 
 };
@@ -38,14 +45,35 @@ class DetectorType{
 class FeatureDetector{
 
     private:
+    /**
+     * @brief the type of the detector
+     */
     DetectorType::Type type;
+
+    /**
+     * @brief the OpenCV feature detector
+     */
     cv::Ptr<cv::Feature2D> features_detector;
 
     void init();
 
     public:
     FeatureDetector(const DetectorType::Type& type) : type{type} {this->init();}
+    
+    /**
+     * @brief method for detecting features of an image
+     * @param img the image to detect features from
+     * @param keypoints the output vector of keypoints
+     * @param descriptors the output matrix of descriptors
+     */
     void detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const;
+    
+     /**
+     * @brief method to detect the features of each model in the dataset
+     * @param models the vector of all models to detect features from
+     * @param models_features the output vector of model features
+     * @param image_filter the image filter to apply to the model image
+     */
     void detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, ImageFilter* image_filter) const;
 
     void updateDetector(cv::Ptr<cv::Feature2D> new_detector) {
