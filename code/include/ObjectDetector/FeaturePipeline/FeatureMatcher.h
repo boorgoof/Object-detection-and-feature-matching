@@ -15,7 +15,7 @@ class MatcherType{
     
 
     static std::vector<MatcherType::Type> getMatcherTypes() {
-        return { MatcherType::Type::FLANN, MatcherType::Type::BRUTEFORCE };
+        return { MatcherType::Type::FLANN, /*MatcherType::Type::BRUTEFORCE*/ };
     }
 
    
