@@ -35,7 +35,7 @@ int main(int argc, const char* argv[]){
     //TEST IMAGES ARE NOT LOADED BUT FILE PATH IS PAIRED WITH CORRESPONDING LABEL VECTOR (that is loaded from file)
     std::map<Object_Type, Dataset> datasets = Utils::Loader::load_datasets(dataset_path);
 
-    std::string log_filename = "DetectionLog.txt";
+    std::string log_filename = "DetectionLog.csv";
     
     
 
