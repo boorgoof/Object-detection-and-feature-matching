@@ -66,17 +66,21 @@ int main(int argc, const char* argv[]){
                 std::map<std::string, std::vector<Label>> predicted_items;
                 
                 //model image filter pipeline (currenlty only gaussian blur)
-                //ImageFilter* model_imagefilter = new ImageFilter();
-                //model_imagefilter->add_filter("Gaussian Blur", Filters::gaussian_blur, cv::Size(5,5));
+                ImageFilter* model_imagefilter = new ImageFilter();
+                model_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
+                model_imagefilter->add_filter("CLAHE Contrast Equalization", Filters::CLAHE_contrast_equalization, 3.0, 8);
+                model_imagefilter->add_filter("Unsharp Mask", Filters::unsharp_mask, 1.0, 1.5);
                 
                 //test image filter pipeline (currently only gaussian blur)
-                //ImageFilter* test_imagefilter = new ImageFilter();
-                //test_imagefilter->add_filter("Gaussian Blur", Filters::gaussian_blur, cv::Size(5,5));
-                
+                ImageFilter* test_imagefilter = new ImageFilter();
+                test_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
+                test_imagefilter->add_filter("CLAHE Contrast Equalization", Filters::CLAHE_contrast_equalization, 3.0, 8);
+                test_imagefilter->add_filter("Unsharp Mask", Filters::unsharp_mask, 1.0, 1.5);
+
                 //create the object detector pipeline
                 //ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second, model_imagefilter, test_imagefilter);
                 
-                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second);
+                ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(d_type), new FeatureMatcher(m_type), obj_dataset.second, model_imagefilter, test_imagefilter);
 
                 object_detector->detect_object_whole_dataset(ds, predicted_items);
                 

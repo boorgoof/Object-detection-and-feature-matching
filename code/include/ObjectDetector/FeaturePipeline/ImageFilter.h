@@ -28,7 +28,10 @@ namespace Filters{
     cv::Mat gaussian_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
     cv::Mat median_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
     cv::Mat average_blur(const cv::Mat& src_img, const cv::Size& kernel_size);
-
+    cv::Mat bilateral_filter(const cv::Mat& src_img, int diameter, double sigma_color, double sigma_space);
+    cv::Mat global_contrast_equalization(const cv::Mat& src_img);
+    cv::Mat CLAHE_contrast_equalization(const cv::Mat& src_img, int clip_limit, int tile_grid_size);
+    cv::Mat unsharp_mask(const cv::Mat& src_img, double sigma, double alpha);
 }
 
 template<typename FilterFunction, typename... Args>
