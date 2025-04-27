@@ -36,8 +36,14 @@ class ObjectDetector{
 
     const std::string& get_method() const { return this->method; }
     void set_method(const std::string& method) { this->method = method; }
+    const std::string& get_filter1() const { return this->filter1; }
+    void set_filter1(const std::string& filter1) { this->filter1 = filter1; }
+    const std::string& get_filter2() const { return this->filter2; }
+    void set_filter2(const std::string& filter2) { this->filter2 = filter2; }
     private:
     std::string method;
+    std::string filter1;
+    std::string filter2;
 };
 
 #endif // OBJECT_DETECTOR_H

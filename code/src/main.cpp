@@ -58,6 +58,7 @@ int main(int argc, const char* argv[]){
 
         //creates the log file if it doesn't exist and clears its content
         std::ofstream clear_file(log_filepath, std::ios::out);
+        clear_file << "Object_Type,Method,ModelFilter,TestFilter,Accuracy,MeanIoU" << std::endl;
         clear_file.close();
 
 
@@ -68,20 +69,20 @@ int main(int argc, const char* argv[]){
         //model image filter pipeline (currenlty only gaussian blur)
         ImageFilter* model_imagefilter = new ImageFilter();
         model_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
-        model_imagefilter->add_filter("CLAHE Contrast Equalization", Filters::CLAHE_contrast_equalization, 3.0, 8);
-        model_imagefilter->add_filter("Unsharp Mask", Filters::unsharp_mask, 1.0, 1.5);
+        model_imagefilter->add_filter("CLAHE", Filters::CLAHE_contrast_equalization, 3.0, 8);
+        model_imagefilter->add_filter("Unsharp", Filters::unsharp_mask, 1.0, 1.5);
         //test image filter pipeline (currently only gaussian blur)
         ImageFilter* test_imagefilter = new ImageFilter();
         test_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
-        test_imagefilter->add_filter("CLAHE Contrast Equalization", Filters::CLAHE_contrast_equalization, 3.0, 8);
-        test_imagefilter->add_filter("Unsharp Mask", Filters::unsharp_mask, 1.0, 1.5);
+        test_imagefilter->add_filter("CLAHE", Filters::CLAHE_contrast_equalization, 3.0, 8);
+        test_imagefilter->add_filter("Unsharp", Filters::unsharp_mask, 1.0, 1.5);
         //create the object detector pipeline
-        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second, std::move(model_imagefilter), std::move(test_imagefilter));
-        object_detectors.push_back(std::move(object_detector));
+        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second, model_imagefilter, test_imagefilter);
+        object_detectors.push_back(object_detector);
 
         //PREPARE SIFT-FLANN OBJECT DETECTOR WITHOUT IMAGE FILTERS
-        object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second);
-        object_detectors.push_back(std::move(object_detector));
+        ObjectDetector* object_detector2 = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second);
+        object_detectors.push_back(object_detector2);
 
         //ADD HERE VIOLA & JONES DETECTOR
 
@@ -99,7 +100,7 @@ int main(int argc, const char* argv[]){
             
             std::string image_output_folder_sub = image_output_folder + "/" + detector->get_method() + "/";
 
-            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method(), accuracy , meanIoU );       
+            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method(), accuracy, meanIoU, detector->get_filter1(), detector->get_filter2());       
             Utils::Logger::printLabelsImg(image_output_folder_sub, obj_dataset.first, predicted_items, real_items);
 
             std::cout << "\tend of detection using " << detector->get_method() << std::endl;

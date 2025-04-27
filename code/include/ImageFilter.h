@@ -41,6 +41,10 @@ class ImageFilter{
      * @return true if the filter was removed, false otherwise.
      */
     bool remove_filter(const std::string& filter_name);
+
+    const std::vector<std::pair<std::string, std::function<cv::Mat(cv::Mat)>>> get_filters() const {
+        return this->filter_pipeline;
+    }
 };
 /**
  * @brief A namespace containing various image filtering functions.

@@ -165,6 +165,8 @@ namespace Utils{
          * @param file_name the name of the file
          * @param obj_type the object type
          * @param method_name the name of the detector and matcher
+         * @param filter_name the name of the filter (applied to the model images)
+         * @param filter_name2 the name of the second filter (applied to the test images)
          * @param accuracy the accuracy value
          * @param meanIoU the mean IoU value
          */
@@ -173,7 +175,9 @@ namespace Utils{
             const std::string& obj_type,
             const std::string& method_name,
             double accuracy,
-            double meanIoU);
+            double meanIoU,
+            const std::string& filter_name = "",
+            const std::string& filter_name2 = "");
 
         /**
          * @brief function to print the predicted and real labels of the  objects in the scene image.

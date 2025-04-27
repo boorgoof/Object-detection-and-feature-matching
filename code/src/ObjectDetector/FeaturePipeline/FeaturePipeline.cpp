@@ -28,8 +28,22 @@ FeaturePipeline::FeaturePipeline(FeatureDetector *fd, FeatureMatcher *fm, Datase
     this->update_detector_matcher_compatibility();
     this->init_models_features();
     std::string filter_name = "";
-    if (this->model_imagefilter != nullptr) filter_name += "-ModelFilter";
-    if (this->test_imagefilter != nullptr) filter_name += "-TestFilter";
+    if (this->model_imagefilter != nullptr){
+        std::string filter1_name = "";
+        for (const auto& filter : this->model_imagefilter->get_filters()) {
+            filter1_name += "-" + filter.first;
+        }
+        this->set_filter1(filter1_name);
+        filter_name += filter1_name;
+    }
+    if (this->test_imagefilter != nullptr){
+        std::string filter2_name = "";
+        for (const auto& filter : this->test_imagefilter->get_filters()) {
+            filter2_name += "-" + filter.first;
+        }
+        this->set_filter2(filter2_name);
+        filter_name += filter2_name;
+    }
     std::string method_name = DetectorType::toString(fd->getType()) + "-" + MatcherType::toString(fm->getType()) + filter_name;
     this->set_method(method_name);
 }
