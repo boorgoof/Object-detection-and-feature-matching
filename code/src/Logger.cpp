@@ -10,6 +10,7 @@
 
 void Utils::Logger::printLabelsImg(const std::string& output_folder, const Object_Type obj, const std::map<std::string, std::vector<Label>>& predictedItems, const std::map<std::string, std::vector<Label>>& realItems){
 
+    
     if (!std::filesystem::exists(output_folder)) {
         std::filesystem::create_directories(output_folder); 
     }
@@ -19,14 +20,14 @@ void Utils::Logger::printLabelsImg(const std::string& output_folder, const Objec
         const std::string& filename = item.first;
         const std::vector<Label>& real_labels = item.second;
 
-        cv::Mat img = Utils::Loader::load_image(filename);
+        cv::Mat img_scene = Utils::Loader::load_image(filename);
         
-        if (img.empty()) {
+        if (img_scene.empty()) {
             throw CustomErrors::ImageLoadError("Error loading the img in printLabelsImg: " , filename);
         }
 
         std::string out_img_name = output_folder + Utils::Directory::get_file_basename(filename) + ".png";
-        cv::Mat out_img = img.clone();
+        cv::Mat out_img = img_scene.clone();
  
         for (const auto& real_label : real_labels) {
             if (real_label.get_class_name().get_type() != obj.get_type()) {
@@ -57,7 +58,9 @@ void Utils::Logger::logDetection(
     const std::string& obj_type,
     const std::string& method_name,
     double accuracy,
-    double meanIoU) {
+    double meanIoU,
+    const std::string& filter_name,
+    const std::string& filter_name2) {
         
     std::ofstream log_file(file_name,  std::ios::app);
 
@@ -68,6 +71,8 @@ void Utils::Logger::logDetection(
 
     log_file <<  obj_type << ",";
     log_file << method_name << ",";
+    log_file << filter_name << ",";
+    log_file << filter_name2 << ",";
     log_file << accuracy << ",";
     log_file << meanIoU << std::endl;
     

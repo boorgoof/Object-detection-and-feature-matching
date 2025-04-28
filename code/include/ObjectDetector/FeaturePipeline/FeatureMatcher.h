@@ -53,6 +53,8 @@ class FeatureMatcher{
     public:
     FeatureMatcher(const MatcherType::Type& type) : type{type} {this->init();}
     FeatureMatcher(const MatcherType::Type& type, cv::DescriptorMatcher* matcher) : type{type}, features_matcher{cv::Ptr<cv::DescriptorMatcher>(matcher)} {}
+    //destructor
+    ~FeatureMatcher();
 
     /**
      * @brief method to match features between two images (the model and the scene)

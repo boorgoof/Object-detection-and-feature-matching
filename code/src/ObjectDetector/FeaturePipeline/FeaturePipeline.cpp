@@ -1,40 +1,47 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
-#include "../../../include/ImageFilter.h"
 #include "../../../include/CustomErrors.h"
 
 void FeaturePipeline::init_models_features() {
     this->models_features.clear();
-    this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features, this->model_imagefilter);
+    this->detector->detectModelsFeatures(this->dataset.get_models(), this->models_features, this->model_imagefilter.get());
 }
 
 void FeaturePipeline::update_detector_matcher_compatibility() {
     if (this->detector->getType() == DetectorType::Type::ORB && this->matcher->getType() == MatcherType::Type::FLANN) {
-        delete this->matcher;
-        this->matcher = new FeatureMatcher(MatcherType::Type::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2)));
+        this->matcher = std::make_unique<FeatureMatcher>(FeatureMatcher(MatcherType::Type::FLANN, new cv::FlannBasedMatcher(cv::makePtr<cv::flann::LshIndexParams>(12, 20, 2))));
     }
 }
 
 FeaturePipeline::~FeaturePipeline() {
-    delete this->detector;
-    delete this->matcher;
-    delete this->model_imagefilter;
-    delete this->test_imagefilter;
 }
 
-FeaturePipeline::FeaturePipeline(FeatureDetector *fd, FeatureMatcher *fm, Dataset &dataset, ImageFilter *model_imagefilter, ImageFilter *test_imagefilter)
-    : detector{fd}, matcher{fm}, dataset{dataset} {
-    this->model_imagefilter = model_imagefilter;
-    this->test_imagefilter = test_imagefilter;
+FeaturePipeline::FeaturePipeline(FeatureDetector* detector, FeatureMatcher* matcher, Dataset& dataset, std::unique_ptr<ImageFilter> model_imagefilter, std::unique_ptr<ImageFilter> test_imagefilter)
+    : detector{detector}, matcher{matcher}, dataset{dataset} {
+    this->model_imagefilter = std::move(model_imagefilter);
+    this->test_imagefilter = std::move(test_imagefilter);
     this->update_detector_matcher_compatibility();
     this->init_models_features();
     std::string filter_name = "";
-    if (this->model_imagefilter != nullptr) filter_name += "-ModelFilter";
-    if (this->test_imagefilter != nullptr) filter_name += "-TestFilter";
-    std::string method_name = DetectorType::toString(fd->getType()) + "-" + MatcherType::toString(fm->getType()) + filter_name;
-    this->set_method(method_name);
+    if (this->model_imagefilter != nullptr){
+        std::string model_filter_name = "";
+        for (const auto& filter : this->model_imagefilter->get_filters()) {
+            model_filter_name += "-" + filter.first;
+        }
+        this->set_model_filter_name(model_filter_name);
+        filter_name += model_filter_name;
+    }
+    if (this->test_imagefilter != nullptr){
+        std::string test_filter_name = "";
+        for (const auto& filter : this->test_imagefilter->get_filters()) {
+            test_filter_name += "-" + filter.first;
+        }
+        this->set_test_filter_name(test_filter_name);
+        filter_name += test_filter_name;
+    }
+    std::string method_name = DetectorType::toString(detector->getType()) + "-" + MatcherType::toString(matcher->getType()) + filter_name;
+    this->set_method_name(method_name);
 }
-void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels)
-{
+void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels) {
 
     out_labels.clear();
 
@@ -47,12 +54,14 @@ void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> 
     }
 
     //detects test image features
-    SceneFeatures src_features;
-    this->detector->detectFeatures(src_img_filtered, src_features.keypoints, src_features.descriptors);
     
+    std::vector<cv::KeyPoint> keypoints;
+    cv::Mat descriptors;
+    this->detector->detectFeatures(src_img_filtered, keypoints, descriptors);
+    SceneFeatures src_features(keypoints, descriptors);
+
     //matches test image features with every models' features and store them in out_matches
     std::vector<std::vector<cv::DMatch>> out_matches;
-    int c = 0;
     for(ModelFeatures model_features : this->models_features){
         std::vector<cv::DMatch> out_matches_t;
 
@@ -61,7 +70,6 @@ void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> 
         }
         catch (const CustomErrors::InvalidArgumentError& e) {
             std::cerr << "Warning: Error in matching features: " << e.what() << std::endl;
-            c++;
             continue; // Skip this model and continue with the next one
         }
         out_matches.push_back(out_matches_t);
@@ -139,6 +147,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));      
     }
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
+    
     /*
     cv::Mat img_scene_copy = img_scene.clone();
     cv::polylines(img_scene_copy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
@@ -159,6 +168,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
     */
+   
     return Label(object_type, sceneBB);
 }
 

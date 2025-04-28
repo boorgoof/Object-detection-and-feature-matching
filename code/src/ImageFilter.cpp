@@ -1,7 +1,11 @@
 #include "../include/ImageFilter.h"
 #include "../include/CustomErrors.h"
 
-cv::Mat ImageFilter::apply_filters(const cv::Mat& src_img){
+ImageFilter::~ImageFilter(){
+    this->filter_pipeline.clear();
+}
+
+cv::Mat ImageFilter::apply_filters(const cv::Mat& src_img) const {   
     cv::Mat filtered_img = src_img.clone();
     for(auto& filter : this->filter_pipeline){
         //std::cout << "Applying filter: " << filter.first << std::endl;

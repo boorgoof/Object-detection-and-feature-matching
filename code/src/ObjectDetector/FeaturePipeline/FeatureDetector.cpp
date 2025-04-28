@@ -3,6 +3,10 @@
 #include "../../../include/Utils.h"
 #include "../../../include/ImageFilter.h"
 
+FeatureDetector::~FeatureDetector() {
+    this->features_detector.release();
+}
+
 void FeatureDetector::init(){
     switch (this->type) {
         case DetectorType::Type::SIFT:
@@ -14,14 +18,19 @@ void FeatureDetector::init(){
         default:
             throw CustomErrors::InvalidArgumentError("type", "Invalid feature detector type");
     }
+
+    std::cout << "FEATURE DETECTOR MEMORY ADDRESS: " << this->features_detector.get() << std::endl;
 }
 
 
 void FeatureDetector::detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const {
+    keypoints.clear();
+    descriptors.release();
+    
     this->features_detector->detectAndCompute(img, cv::noArray(), keypoints, descriptors);
 }
 
-void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, ImageFilter* image_filter) const {
+void FeatureDetector::detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, const ImageFilter* image_filter) const {
     models_features.clear();
     
     for (size_t idx = 0; idx < models.size(); ++idx) {

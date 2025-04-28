@@ -7,8 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include "../../Label.h"
 #include "Features.h"
-
-class ImageFilter;
+#include "../../ImageFilter.h"
 
 /**
  * @brief FeaturePipeline class to detect objects in images using feature detection and matching.
@@ -20,20 +19,20 @@ class FeaturePipeline : public ObjectDetector {
         /**
         * @brief FeatureDetector pointer to the feature detector used by the pipeline.
         */
-        FeatureDetector* detector;
+        std::unique_ptr<FeatureDetector> detector;
         /**
          * @brief FeatureMatcher pointer to the feature matcher used by the pipeline.
          */
-        FeatureMatcher* matcher;
+        std::unique_ptr<FeatureMatcher> matcher;
     
         /**
          * @brief ImageFilter pointer to the image filter used by the pipeline.
          */
-        ImageFilter* model_imagefilter;
+        std::unique_ptr<ImageFilter> model_imagefilter;
         /**
          * @brief ImageFilter pointer to the image filter used by the pipeline.
          */
-        ImageFilter* test_imagefilter;
+        std::unique_ptr<ImageFilter> test_imagefilter;
 
         /**
          * @brief Dataset reference to the dataset used by the pipeline.
@@ -57,20 +56,20 @@ class FeaturePipeline : public ObjectDetector {
 
     public:
 
-        FeaturePipeline(FeatureDetector* fd, FeatureMatcher* fm, Dataset& dataset, ImageFilter* model_imagefilter = nullptr, ImageFilter* test_imagefilter = nullptr);
+        FeaturePipeline(FeatureDetector* detector, FeatureMatcher* matcher, Dataset& dataset, std::unique_ptr<ImageFilter> model_imagefilter = nullptr, std::unique_ptr<ImageFilter> test_imagefilter = nullptr);
         ~FeaturePipeline();
 
         void addDetectorComponent(FeatureDetector* fd) {
-            detector = fd;
+            this->detector.reset(fd);
         }
         void addMatcherComponent(FeatureMatcher* fm) {
-            matcher = fm;
+            this->matcher.reset(fm);
         }
-        void addModelImageFilterComponent(ImageFilter* imagefilter) {
-            this->model_imagefilter = imagefilter;
+        void addModelImageFilterComponent(std::unique_ptr<ImageFilter> imagefilter) {
+            this->model_imagefilter = std::move(imagefilter);
         }
-        void addTestImageFilterComponent(ImageFilter* imagefilter) {
-            this->test_imagefilter = imagefilter;
+        void addTestImageFilterComponent(std::unique_ptr<ImageFilter> imagefilter) {
+            this->test_imagefilter = std::move(imagefilter);
         }
         void setDataset(Dataset& dataset) {
             this->dataset = dataset;
