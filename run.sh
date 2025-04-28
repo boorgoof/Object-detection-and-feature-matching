@@ -1,1 +1,1 @@
-cd build && ./main ; cd ..
+cd build && ./main ../dataset ../output; cd ..
