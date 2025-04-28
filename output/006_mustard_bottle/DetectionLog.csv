@@ -1,4 +1,9 @@
 Object_Type,Method,ModelFilter,TestFilter,Accuracy,MeanIoU
+<<<<<<< HEAD
 006_mustard_bottle,SIFT-FLANN,,,0.5,0.422573
 006_mustard_bottle,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0.6,0.511646
+=======
+006_mustard_bottle,SIFT-FLANN,,,0.5,0.456412
+006_mustard_bottle,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0.5,0.465672
+>>>>>>> 43874017156df01854fb85255735403be9412ac0
 006_mustard_bottle,ViolaJones,GaussianBlur,GaussianBlur,0,0.00498579
