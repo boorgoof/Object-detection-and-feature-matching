@@ -13,8 +13,8 @@ int main() {
     //std::string cascadePath = "../Image_generated/cascade_power_drill/cascade.xml";
     
     //std::string cascadePath = "../Image_generated/cascade_sugar_box_gray40/cascade.xml";
-    std::string cascadePath = "../Image_generated/cascade_mustard_bottle_gray60/cascade.xml";
-    //std::string cascadePath = "../Image_generated/cascade_power_drill_gray40/cascade.xml";
+    //std::string cascadePath = "../Image_generated/cascade_mustard_bottle_gray60/cascade.xml";
+    std::string cascadePath = "../Image_generated/cascade_power_drill_gray60/cascade.xml";
     if (!cascade.load(cascadePath)) {
         std::cerr << "Error loading cascade classifier from " << cascadePath << std::endl;
         return -1;
@@ -22,9 +22,9 @@ int main() {
 
     // Get the list of test images (adjust extension if needed)
     std::vector<cv::String> imageFiles;
-    std::string testDir = "../dataset/006_mustard_bottle/test_images/*.jpg";
+    //std::string testDir = "../dataset/006_mustard_bottle/test_images/*.jpg";
     //std::string testDir = "../Image_generated/Mustard_bottle_Generated/*.png";
-    //std::string testDir = "../dataset/035_power_drill/test_images/*.jpg";
+    std::string testDir = "../dataset/035_power_drill/test_images/*.jpg";
     //std::string testDir = "../Image_generated/Power_drill_Generated/*.png";
     //std::string testDir = "../dataset/004_sugar_box/test_images/*.jpg";
     cv::glob(testDir, imageFiles, false);
@@ -45,14 +45,14 @@ int main() {
         cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
         //cv::equalizeHist(gray, gray);
         cv::Mat blurred_gray;
-        cv::GaussianBlur(gray, blurred_gray, cv::Size(3, 3), 0); // Kernel size (must be odd), sigmaX
+        cv::GaussianBlur(gray, blurred_gray, cv::Size(1, 1), 0); // Kernel size (must be odd), sigmaX
         // Then potentially apply CLAHE or equalizeHist to blurred_gray
         // Mat image_to_detect = blurred_gray;
         //imshow("Gray", blurred_gray);
 
         // Detect objects using the cascade classifier
         std::vector<cv::Rect> detections;
-        cascade.detectMultiScale(blurred_gray, detections, 1.0005, 3, 3, cv::Size(5, 5)); 
+        cascade.detectMultiScale(blurred_gray, detections, 1.1, 3, 1, cv::Size(10, 10)); 
         // Option 1a: Slightly more sensitive scaling
         //cascade.detectMultiScale(blurred_gray, detections, 1.05, 0, 0, cv::Size(5, 5));
         // If any detection, output details
