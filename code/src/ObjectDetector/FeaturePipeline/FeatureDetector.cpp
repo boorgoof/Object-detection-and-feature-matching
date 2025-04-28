@@ -20,8 +20,6 @@ void FeatureDetector::init(){
         default:
             throw CustomErrors::InvalidArgumentError("type", "Invalid feature detector type");
     }
-
-    std::cout << "FEATURE DETECTOR MEMORY ADDRESS: " << this->features_detector.get() << std::endl;
 }
 
 

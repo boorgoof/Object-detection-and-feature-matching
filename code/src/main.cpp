@@ -100,7 +100,6 @@ int main(int argc, const char* argv[]){
         for (auto& detector : object_detectors) {
 
             std::map<std::string, std::vector<Label>> predicted_items;
-            //std::cout << "detector memory address: " << detector.get() << std::endl;
             std::cout << "\tdetecting objects using " << detector->get_method_name() << "..." << std::endl;
 
             detector->detect_object_whole_dataset(ds, predicted_items);
