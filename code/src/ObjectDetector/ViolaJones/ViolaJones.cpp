@@ -1,4 +1,4 @@
-#include "../../include/ObjectDetector/ViolaJones/ViolaJones.h"
+#include "../../../include/ObjectDetector/ViolaJones/ViolaJones.h"
 
 
 
@@ -39,7 +39,6 @@ void ViolaJones::detect_objects(const cv::Mat& src_img, std::vector<Label>& out_
 
     this->cascade.detectMultiScale(gray_img, detections, 1.001, 3, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(5, 5));
     cv::Mat output_img;
-    // Ensure we have a 3-channel image for drawing colored rectangles
     
     if (!detections.empty()) {
         cv::Rect bestDetection = detections[0];

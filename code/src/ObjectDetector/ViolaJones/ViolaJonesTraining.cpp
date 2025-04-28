@@ -1,4 +1,4 @@
-#include "../include/ViolaJonesTraining.h"
+#include "../../../include/ObjectDetector/ViolaJones/ViolaJonesTraining.h"
 
 
 int ViolaJonesTraining::PositiveSamplesFiles(const std::string &inputFolder, const std::string &outputDir, const std::string &fileName) {
