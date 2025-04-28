@@ -57,7 +57,10 @@ class FeaturePipeline : public ObjectDetector {
     public:
 
         /**
-         * @brief Constructor of the FeaturePipeline class.
+         * @brief This constructor initialize member variables, 
+         *        checks the compatibility between the detector and matcher, 
+         *        calculates all the models' features
+         *        and sets the method's name and the filter's names.
          * @param detector pointer to the feature detector used by the pipeline.
          * @param matcher pointer to the feature matcher used by the pipeline.
          * @param dataset reference to the dataset used by the pipeline.

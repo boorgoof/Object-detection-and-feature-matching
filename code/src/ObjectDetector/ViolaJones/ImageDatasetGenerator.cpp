@@ -1,4 +1,4 @@
-#include "../include/ImageDatasetGenerator.h"
+#include "../../../include/ObjectDetector/ViolaJones/ImageDatasetGenerator.h"
 #include "../include/CustomErrors.h"
 
 void ImageDatasetGenerator::generateRotatedImages(const std::string& inputImage, const std::string& inputMask, const std::string& outputFolder, int numImages, bool genLightVariations, int numLightVariations) {
