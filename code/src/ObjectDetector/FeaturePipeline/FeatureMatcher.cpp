@@ -1,7 +1,9 @@
 #include "../../../include/ObjectDetector/FeaturePipeline/FeatureMatcher.h"
 #include "../../../include/CustomErrors.h"
 
-
+FeatureMatcher::~FeatureMatcher() {
+    this->features_matcher.release();
+}
 
 void FeatureMatcher::init(){
     switch (this->type) {

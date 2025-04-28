@@ -59,6 +59,7 @@ class FeatureDetector{
 
     public:
     FeatureDetector(const DetectorType::Type& type) : type{type} {this->init();}
+    ~FeatureDetector();
     
     /**
      * @brief method for detecting features of an image
@@ -74,7 +75,7 @@ class FeatureDetector{
      * @param models_features the output vector of model features
      * @param image_filter the image filter to apply to the model image
      */
-    void detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, ImageFilter* image_filter) const;
+    void detectModelsFeatures(const std::vector<std::pair<std::string, std::string>>& models, std::vector<ModelFeatures>& models_features, const ImageFilter* image_filter = nullptr) const;
 
     void updateDetector(cv::Ptr<cv::Feature2D> new_detector) {
         this->features_detector.release();

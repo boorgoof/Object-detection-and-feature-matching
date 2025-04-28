@@ -63,26 +63,29 @@ int main(int argc, const char* argv[]){
 
 
         //vector of object detectors to be used
-        std::vector<ObjectDetector*> object_detectors;
+        std::vector<std::unique_ptr<ObjectDetector>> object_detectors;
         
+        
+        //PREPARE SIFT-FLANN OBJECT DETECTOR WITHOUT IMAGE FILTERS
+        std::unique_ptr<ObjectDetector> object_detector2{new FeaturePipeline{new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second}};
+        object_detectors.push_back(std::move(object_detector2));
+
+
         //PREPARE SIFT-FLANN OBJECT DETECTOR USING IMAGE FILTERS
         //model image filter pipeline (currenlty only gaussian blur)
-        ImageFilter* model_imagefilter = new ImageFilter();
+        std::unique_ptr<ImageFilter> model_imagefilter{new ImageFilter()};
         model_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
         model_imagefilter->add_filter("CLAHE", Filters::CLAHE_contrast_equalization, 3.0, 8);
         model_imagefilter->add_filter("Unsharp", Filters::unsharp_mask, 1.0, 1.5);
         //test image filter pipeline (currently only gaussian blur)
-        ImageFilter* test_imagefilter = new ImageFilter();
+        std::unique_ptr<ImageFilter> test_imagefilter{new ImageFilter()};
         test_imagefilter->add_filter("Bilateral", Filters::bilateral_filter, 5, 75, 75);
         test_imagefilter->add_filter("CLAHE", Filters::CLAHE_contrast_equalization, 3.0, 8);
         test_imagefilter->add_filter("Unsharp", Filters::unsharp_mask, 1.0, 1.5);
         //create the object detector pipeline
-        ObjectDetector* object_detector = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second, model_imagefilter, test_imagefilter);
-        object_detectors.push_back(object_detector);
-
-        //PREPARE SIFT-FLANN OBJECT DETECTOR WITHOUT IMAGE FILTERS
-        ObjectDetector* object_detector2 = new FeaturePipeline(new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second);
-        object_detectors.push_back(object_detector2);
+        std::unique_ptr<ObjectDetector> object_detector{new FeaturePipeline{new FeatureDetector(DetectorType::Type::SIFT), new FeatureMatcher(MatcherType::Type::FLANN), obj_dataset.second, std::move(model_imagefilter), std::move(test_imagefilter)}};
+        object_detectors.push_back(std::move(object_detector));
+        
 
         //ADD HERE VIOLA & JONES DETECTOR
 
@@ -90,7 +93,7 @@ int main(int argc, const char* argv[]){
         //iterate over all the object detectors and detect objects in the dataset, saving the accuracy, mean IoU and the predicted items (images with bounding boxes)
         for (auto& detector : object_detectors) {
             std::map<std::string, std::vector<Label>> predicted_items;
-            
+            //std::cout << "detector memory address: " << detector.get() << std::endl;
             std::cout << "\tdetecting objects using " << detector->get_method_name() << "..." << std::endl;
 
             detector->detect_object_whole_dataset(ds, predicted_items);
@@ -100,11 +103,15 @@ int main(int argc, const char* argv[]){
             
             std::string image_output_folder_sub = image_output_folder + "/" + detector->get_method_name() + "/";
 
-            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method_name(), accuracy, meanIoU, detector->get_model_filter_name(), detector->get_test_filter_name());       
+            std::string model_filter_name = detector->get_model_filter_name().empty() ? "" : detector->get_model_filter_name();
+            std::string test_filter_name = detector->get_test_filter_name().empty() ? "" : detector->get_test_filter_name();
+            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method_name(), accuracy, meanIoU, model_filter_name, test_filter_name);       
             Utils::Logger::printLabelsImg(image_output_folder_sub, obj_dataset.first, predicted_items, real_items);
 
             std::cout << "\tend of detection using " << detector->get_method_name() << std::endl;
         }
+
+        object_detectors.clear();
     }
 }
 

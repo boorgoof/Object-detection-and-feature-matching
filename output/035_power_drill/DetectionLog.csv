@@ -1,3 +1,3 @@
 Object_Type,Method,ModelFilter,TestFilter,Accuracy,MeanIoU
-035_power_drill,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0.1,0.128212
-035_power_drill,SIFT-FLANN,,,0.2,0.166703
+035_power_drill,SIFT-FLANN,,,0.1,0.11703
+035_power_drill,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0,0.0681583

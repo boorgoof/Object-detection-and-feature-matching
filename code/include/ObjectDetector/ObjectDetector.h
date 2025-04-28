@@ -13,9 +13,11 @@
 class ObjectDetector{
     public:
     ObjectDetector() {model_filter_name = ""; test_filter_name = "";};
+    /*
     ObjectDetector(const ObjectDetector&) = delete;
-    ObjectDetector(ObjectDetector&&) = delete;
     ObjectDetector& operator=(const ObjectDetector&) = delete;
+    */
+    ObjectDetector(ObjectDetector&&) = delete;
     ObjectDetector& operator=(ObjectDetector&&) = delete;
     virtual ~ObjectDetector() = 0;
 

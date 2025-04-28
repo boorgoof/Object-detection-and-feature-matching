@@ -19,12 +19,13 @@ class ImageFilter{
 
     public:
     ImageFilter(){}
+    ~ImageFilter();
     /**
      * @brief Applies the filter pipeline to the input image.
      * @param src_img The input image to be filtered.
      * @return The filtered image.
      */
-    cv::Mat apply_filters(const cv::Mat& src_img);
+    cv::Mat apply_filters(const cv::Mat& src_img) const;
 
     /**
      * @brief Adds a filter to the filter pipeline.
