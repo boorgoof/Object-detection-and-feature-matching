@@ -62,7 +62,6 @@ void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> 
 
     //matches test image features with every models' features and store them in out_matches
     std::vector<std::vector<cv::DMatch>> out_matches;
-    int c = 0;
     for(ModelFeatures model_features : this->models_features){
         std::vector<cv::DMatch> out_matches_t;
 
@@ -71,7 +70,6 @@ void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> 
         }
         catch (const CustomErrors::InvalidArgumentError& e) {
             std::cerr << "Warning: Error in matching features: " << e.what() << std::endl;
-            c++;
             continue; // Skip this model and continue with the next one
         }
         out_matches.push_back(out_matches_t);
@@ -149,6 +147,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
         scene_corners_int.push_back(cv::Point2i(scene_corners[i].x, scene_corners[i].y));      
     }
     cv::Rect sceneBB = cv::boundingRect(scene_corners);     //bounding box of the 4 scene corners obtained by the perspective transform (commonly way bigger than the former bounding box)
+    
     /*
     cv::Mat img_scene_copy = img_scene.clone();
     cv::polylines(img_scene_copy, scene_corners_int, true, cv::Scalar(255, 0, 0), 5);   //BLUE draw the bounding box (rotated rectangle) on the image
@@ -169,6 +168,7 @@ Label FeaturePipeline::findBoundingBox(const std::vector<cv::DMatch>& matches,
     cv::imshow("matches", imgSceneMatches);
     cv::waitKey(0);
     */
+   
     return Label(object_type, sceneBB);
 }
 
