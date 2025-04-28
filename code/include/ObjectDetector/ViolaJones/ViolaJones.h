@@ -3,8 +3,8 @@
 
 #include "../ObjectDetector.h"
 #include "../../Label.h"
-#include "../../CustomErrors.h"
 #include "../../Dataset.h"
+#include "../../CustomErrors.h"
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
@@ -32,7 +32,7 @@ public:
      * @brief Constructor for the ViolaJones class.
      * @param cascadePath The path to the trained cascade file.
      */
-    ViolaJones(const Object_Type::Type type);
+    ViolaJones(const Object_Type& type);
     /**
      * @brief Destructor for the ViolaJones class.
      */

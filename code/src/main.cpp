@@ -91,7 +91,8 @@ int main(int argc, const char* argv[]){
         
 
         //ADD HERE VIOLA & JONES DETECTOR
-        object_detector = new ViolaJones(type);
+        std::unique_ptr<ObjectDetector> violaJonesDetector(new ViolaJones(type));
+        object_detectors.push_back(std::move(violaJonesDetector));
 
         //iterate over all the object detectors and detect objects in the dataset, saving the accuracy, mean IoU and the predicted items (images with bounding boxes)
         for (auto& detector : object_detectors) {

@@ -1,7 +1,0 @@
-Object_Type,Method,ModelFilter,TestFilter,Accuracy,MeanIoU
-004_sugar_box,SIFT-FLANN,,,0.9,0.671773
-<<<<<<< HEAD
-004_sugar_box,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0.7,0.587006
-=======
-004_sugar_box,SIFT-FLANN-Bilateral-CLAHE-Unsharp-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,-Bilateral-CLAHE-Unsharp,0.8,0.62771
->>>>>>> e296676db453f3d6e4da7caf9472b104dd1fdb5a
