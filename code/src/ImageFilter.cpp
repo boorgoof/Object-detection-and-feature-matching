@@ -1,3 +1,5 @@
+//Matteo Bino
+
 #include "../include/ImageFilter.h"
 #include "../include/CustomErrors.h"
 

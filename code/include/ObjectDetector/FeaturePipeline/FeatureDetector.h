@@ -1,3 +1,5 @@
+//Federico Meneghetti
+
 #ifndef FEATURE_DETECTOR_H
 #define FEATURE_DETECTOR_H
 

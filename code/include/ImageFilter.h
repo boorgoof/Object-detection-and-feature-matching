@@ -1,3 +1,5 @@
+//Matteo Bino
+
 #ifndef IMAGEFILTER_H
 #define IMAGEFILTER_H
 

@@ -1,3 +1,5 @@
+//Gianluca Caregnato
+
 #ifndef ImageDatasetGenerator_h
 #define ImageDatasetGenerator_h
 

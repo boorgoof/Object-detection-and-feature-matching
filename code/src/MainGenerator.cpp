@@ -1,3 +1,5 @@
+//Gianluca Caregnato
+
 #include "../include/ObjectDetector/ViolaJones/ImageDatasetGenerator.h"
 #include "../include/Utils.h"
 #include "../include/ObjectDetector/ViolaJones/ViolaJonesTraining.h"

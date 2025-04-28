@@ -1,3 +1,5 @@
+//Federico Meneghetti
+
 #include "../../include/ObjectDetector/ObjectDetector.h"
 #include "../../include/Utils.h"
 

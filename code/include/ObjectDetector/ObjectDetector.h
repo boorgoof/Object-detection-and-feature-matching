@@ -1,3 +1,5 @@
+//Matteo Bino
+
 #ifndef OBJECT_DETECTOR_H
 #define OBJECT_DETECTOR_H
 

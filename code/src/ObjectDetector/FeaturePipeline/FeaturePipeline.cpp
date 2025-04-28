@@ -1,3 +1,5 @@
+//Federico Meneghetti
+
 #include "../../../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
 #include "../../../include/CustomErrors.h"
 

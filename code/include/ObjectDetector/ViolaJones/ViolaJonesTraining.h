@@ -1,3 +1,5 @@
+//Gianluca Caregnato
+
 #ifndef ViolaJonesTraining_h
 #define ViolaJonesTraining_h
 

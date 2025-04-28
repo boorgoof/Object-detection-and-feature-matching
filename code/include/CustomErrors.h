@@ -1,3 +1,5 @@
+//Gianluca Caregnato
+
 #ifndef CUSTOM_ERRORS_H
 #define CUSTOM_ERRORS_H
 

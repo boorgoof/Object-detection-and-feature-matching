@@ -1,3 +1,5 @@
+//Gianluca Caregnato
+
 #ifndef VIOLA_JONES_H
 #define VIOLA_JONES_H
 
