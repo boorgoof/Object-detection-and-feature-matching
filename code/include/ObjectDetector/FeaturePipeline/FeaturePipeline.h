@@ -40,22 +40,30 @@ class FeaturePipeline : public ObjectDetector {
         Dataset& dataset;
 
         /**
-         * @brief ector of ModelFeatures to store the features of the all the dataset's models.
+         * @brief vector of ModelFeatures to store the features of the all the dataset's models.
          */
         std::vector<ModelFeatures> models_features;
 
          /**
-         * @brief method to initialize all the models' features.
+         * @brief initialize all the models' features.
          */
         void init_models_features();
 
         /**
-         * @brief method to check and to update the compatibility between the detector and matcher.
+         * @brief  check and to update the compatibility between the detector and matcher.
          */
         void update_detector_matcher_compatibility();
 
     public:
 
+        /**
+         * @brief Constructor of the FeaturePipeline class.
+         * @param detector pointer to the feature detector used by the pipeline.
+         * @param matcher pointer to the feature matcher used by the pipeline.
+         * @param dataset reference to the dataset used by the pipeline.
+         * @param model_imagefilter pointer to the image filter used by the pipeline.
+         * @param test_imagefilter pointer to the image filter used by the pipeline.
+         */
         FeaturePipeline(FeatureDetector* detector, FeatureMatcher* matcher, Dataset& dataset, std::unique_ptr<ImageFilter> model_imagefilter = nullptr, std::unique_ptr<ImageFilter> test_imagefilter = nullptr);
         ~FeaturePipeline();
 

@@ -59,8 +59,8 @@ void Utils::Logger::logDetection(
     const std::string& method_name,
     double accuracy,
     double meanIoU,
-    const std::string& filter_name,
-    const std::string& filter_name2) {
+    const std::string& filter_model_name,
+    const std::string& filter_scene_name) {
         
     std::ofstream log_file(file_name,  std::ios::app);
 
@@ -71,8 +71,8 @@ void Utils::Logger::logDetection(
 
     log_file <<  obj_type << ",";
     log_file << method_name << ",";
-    log_file << filter_name << ",";
-    log_file << filter_name2 << ",";
+    log_file << filter_model_name << ",";
+    log_file << filter_scene_name << ",";
     log_file << accuracy << ",";
     log_file << meanIoU << std::endl;
     

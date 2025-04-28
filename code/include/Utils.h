@@ -161,14 +161,12 @@ namespace Utils{
     namespace Logger{
 
         /**
-         * @brief function to log the detection results in a .cvs file:  Object_Type, FeatureDetector-FeatureMatcher, Accuracy, MeanIoU.
-         * @param file_name the name of the file
+         * @brief function to log the detection results in a .cvs file.
+         * @param file_name the name of the file to save the results
          * @param obj_type the object type
-         * @param method_name the name of the detector and matcher
-         * @param filter_name the name of the filter (applied to the model images)
-         * @param filter_name2 the name of the second filter (applied to the test images)
-         * @param accuracy the accuracy value
-         * @param meanIoU the mean IoU value
+         * @param method_name the name of the method used to detect the objects: Detector-Matcher
+         * @param accuracy the accuracy of the detection
+         * @param meanIoU the mean IoU of the detection
          */
         void logDetection(
             const std::string& file_name,
@@ -176,8 +174,8 @@ namespace Utils{
             const std::string& method_name,
             double accuracy,
             double meanIoU,
-            const std::string& filter_name = "",
-            const std::string& filter_name2 = "");
+            const std::string& filter_model_name = "",
+            const std::string& filter_scene_name = "");
 
         /**
          * @brief function to print the predicted and real labels of the  objects in the scene image.
