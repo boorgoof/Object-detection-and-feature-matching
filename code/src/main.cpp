@@ -91,19 +91,19 @@ int main(int argc, const char* argv[]){
         for (auto& detector : object_detectors) {
             std::map<std::string, std::vector<Label>> predicted_items;
             
-            std::cout << "\tdetecting objects using " << detector->get_method() << "..." << std::endl;
+            std::cout << "\tdetecting objects using " << detector->get_method_name() << "..." << std::endl;
 
             detector->detect_object_whole_dataset(ds, predicted_items);
             
             double accuracy = Utils::DetectionAccuracy::calculateDatasetAccuracy(obj_dataset.first, real_items, predicted_items);
             double meanIoU = Utils::DetectionAccuracy::calculateMeanIoU(obj_dataset.first, real_items, predicted_items);
             
-            std::string image_output_folder_sub = image_output_folder + "/" + detector->get_method() + "/";
+            std::string image_output_folder_sub = image_output_folder + "/" + detector->get_method_name() + "/";
 
-            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method(), accuracy, meanIoU, detector->get_filter1(), detector->get_filter2());       
+            Utils::Logger::logDetection(log_filepath, type.to_string(), detector->get_method_name(), accuracy, meanIoU, detector->get_model_filter_name(), detector->get_test_filter_name());       
             Utils::Logger::printLabelsImg(image_output_folder_sub, obj_dataset.first, predicted_items, real_items);
 
-            std::cout << "\tend of detection using " << detector->get_method() << std::endl;
+            std::cout << "\tend of detection using " << detector->get_method_name() << std::endl;
         }
     }
 }

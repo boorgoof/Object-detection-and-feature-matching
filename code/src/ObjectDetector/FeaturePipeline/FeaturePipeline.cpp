@@ -29,23 +29,23 @@ FeaturePipeline::FeaturePipeline(FeatureDetector *fd, FeatureMatcher *fm, Datase
     this->init_models_features();
     std::string filter_name = "";
     if (this->model_imagefilter != nullptr){
-        std::string filter1_name = "";
+        std::string model_filter_name = "";
         for (const auto& filter : this->model_imagefilter->get_filters()) {
-            filter1_name += "-" + filter.first;
+            model_filter_name += "-" + filter.first;
         }
-        this->set_filter1(filter1_name);
-        filter_name += filter1_name;
+        this->set_model_filter_name(model_filter_name);
+        filter_name += model_filter_name;
     }
     if (this->test_imagefilter != nullptr){
-        std::string filter2_name = "";
+        std::string test_filter_name = "";
         for (const auto& filter : this->test_imagefilter->get_filters()) {
-            filter2_name += "-" + filter.first;
+            test_filter_name += "-" + filter.first;
         }
-        this->set_filter2(filter2_name);
-        filter_name += filter2_name;
+        this->set_test_filter_name(test_filter_name);
+        filter_name += test_filter_name;
     }
     std::string method_name = DetectorType::toString(fd->getType()) + "-" + MatcherType::toString(fm->getType()) + filter_name;
-    this->set_method(method_name);
+    this->set_method_name(method_name);
 }
 void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels)
 {
