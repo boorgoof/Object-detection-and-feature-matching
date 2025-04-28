@@ -56,7 +56,7 @@ int main(){
     ViolaJonesTraining training;
     std::vector<std::string> inputFolders = { "../Image_generated/Mustard_bottle_GeneratedGray", "../Image_generated/Power_drill_GeneratedGray", "../Image_generated/Sugar_box_GeneratedGray" };
     // Mustard_bottle samples
-    std::string outputDir = "../Image_generated";
+    std::string outputDir = "../ViolaJonesModels";
     std::string fileName = "Mustard_bottleG.txt";
     std::string fileNameNegative = "Mustard_bottle_negativeG.txt";
     int i = training.PositiveSamplesFiles(inputFolders[0], outputDir, fileName);

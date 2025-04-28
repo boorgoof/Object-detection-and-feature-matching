@@ -30,9 +30,9 @@ private:
      * @brief A map to associate object types with their corresponding cascade file paths.
      */
     static inline const std::map<Object_Type, std::string> objectTypeMap = {
-        { Object_Type::Type::SUGAR_BOX, "../Image_generated/cascade_sugar_box_gray40/cascade.xml" },
-        { Object_Type::Type::MUSTARD_BOTTLE, "../Image_generated/cascade_mustard_bottle_gray60/cascade.xml" },
-        { Object_Type::Type::POWER_DRILL, "../Image_generated/cascade_power_drill_gray60/cascade.xml" }
+        { Object_Type::Type::SUGAR_BOX, "../ViolaJonesModels/cascade_sugar_box_gray40/cascade.xml" },
+        { Object_Type::Type::MUSTARD_BOTTLE, "../ViolaJonesModels/cascade_mustard_bottle_gray60/cascade.xml" },
+        { Object_Type::Type::POWER_DRILL, "../ViolaJonesModels/cascade_power_drill_gray60/cascade.xml" }
     };
 
 public:
