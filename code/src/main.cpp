@@ -5,9 +5,11 @@
 #include "../include/Utils.h"
 #include "../include/Dataset.h"
 #include "../include/ObjectDetector/FeaturePipeline/FeaturePipeline.h"
+#include "../include/ObjectDetector/ViolaJones/ViolaJones.h"
 #include "../include/ImageFilter.h"
 #include "../include/CustomErrors.h"
 #include <filesystem>
+
 
 
 int main(int argc, const char* argv[]){
@@ -89,8 +91,9 @@ int main(int argc, const char* argv[]){
         
 
         //ADD HERE VIOLA & JONES DETECTOR
+        std::unique_ptr<ObjectDetector> violaJonesDetector(new ViolaJones(type));
+        object_detectors.push_back(std::move(violaJonesDetector));
 
-        
         //iterate over all the object detectors and detect objects in the dataset, saving the accuracy, mean IoU and the predicted items (images with bounding boxes)
         for (auto& detector : object_detectors) {
 
