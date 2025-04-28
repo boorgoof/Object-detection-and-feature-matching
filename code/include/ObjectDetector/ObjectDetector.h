@@ -12,7 +12,7 @@
  */
 class ObjectDetector{
     public:
-    ObjectDetector() = default;
+    ObjectDetector() {model_filter_name = ""; test_filter_name = "";};
     ObjectDetector(const ObjectDetector&) = delete;
     ObjectDetector(ObjectDetector&&) = delete;
     ObjectDetector& operator=(const ObjectDetector&) = delete;
@@ -34,16 +34,16 @@ class ObjectDetector{
      */
     const size_t detect_object_whole_dataset(const Dataset& dataset, std::map<std::string, std::vector<Label>>& predicted_items);
 
-    const std::string& get_method() const { return this->method; }
-    void set_method(const std::string& method) { this->method = method; }
-    const std::string& get_filter1() const { return this->filter1; }
-    void set_filter1(const std::string& filter1) { this->filter1 = filter1; }
-    const std::string& get_filter2() const { return this->filter2; }
-    void set_filter2(const std::string& filter2) { this->filter2 = filter2; }
+    const std::string& get_method_name() const { return this->method_name; }
+    void set_method_name(const std::string& method_name) { this->method_name = method_name; }
+    const std::string& get_model_filter_name() const { return this->model_filter_name; }
+    void set_model_filter_name(const std::string& model_filter_name) { this->model_filter_name = model_filter_name; }
+    const std::string& get_test_filter_name() const { return this->test_filter_name; }
+    void set_test_filter_name(const std::string& test_filter_name) { this->test_filter_name = test_filter_name; }
     private:
-    std::string method;
-    std::string filter1;
-    std::string filter2;
+    std::string method_name;
+    std::string model_filter_name;
+    std::string test_filter_name;
 };
 
 #endif // OBJECT_DETECTOR_H
