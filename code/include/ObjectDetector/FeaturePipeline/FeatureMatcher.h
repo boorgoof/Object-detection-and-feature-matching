@@ -57,7 +57,7 @@ class FeatureMatcher{
     ~FeatureMatcher();
 
     /**
-     * @brief method to match features between two images (the model and the scene)
+     * @brief match features between two images (the model and the scene)
      * @param modelDescriptors the descriptors of the model image
      * @param sceneDescriptors the descriptors of the scene image
      * @param matches the output vector of matches between the two input images

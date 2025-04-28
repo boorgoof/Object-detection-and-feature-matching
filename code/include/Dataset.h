@@ -50,13 +50,13 @@ class Dataset{
     Dataset(const Object_Type& type, const std::string& folderpath = "");
 
     /**
-     * @brief method to load test items' filenames from the corresponding folder into class member test_items.
+     * @brief load test items' filenames from the corresponding folder into class member test_items.
      * @param folderpath string to define the test items folder path.
      * @return size_t number of test items loaded.
      */
     const size_t load_test_items(const std::string& folderpath);
     /**
-     * @brief method to load models' filenames from the corresponding folder into class member models.
+     * @brief load models' filenames from the corresponding folder into class member models.
      * @param folderpath string to define the models folder path.
      * @return size_t number of models loaded.
      * @details the function will throw an error if the number of images and masks is not the same.

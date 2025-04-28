@@ -87,14 +87,14 @@ class FeaturePipeline : public ObjectDetector {
         }
         
         /**
-         * @brief method to detect objects in the scene image.
+         * @brief detect objects in the scene image.
          * @param src_img the scene (test) image
          * @param out_labels the output vector of labels that will contain the detected objects
          */
         void detect_objects(const cv::Mat& src_img, std::vector<Label>& out_labels) override;
 
         /**
-        * @brief method to find the label (so the bounding box) of the object in the scene image.
+        * @brief find the label (so the bounding box) of the object in the scene image.
         * @param matches the matches between the model and the scene
         * @param model_keypoint the keypoints of the model
         * @param scene_keypoint the keypoints of the scene (test image)

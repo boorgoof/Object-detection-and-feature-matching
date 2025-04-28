@@ -41,6 +41,7 @@ FeaturePipeline::FeaturePipeline(FeatureDetector* detector, FeatureMatcher* matc
     std::string method_name = DetectorType::toString(detector->getType()) + "-" + MatcherType::toString(matcher->getType()) + filter_name;
     this->set_method_name(method_name);
 }
+
 void FeaturePipeline::detect_objects(const cv::Mat &src_img, std::vector<Label> &out_labels) {
 
     out_labels.clear();

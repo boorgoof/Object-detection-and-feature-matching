@@ -62,7 +62,7 @@ class FeatureDetector{
     ~FeatureDetector();
     
     /**
-     * @brief method for detecting features of an image
+     * @brief detect features of an image
      * @param img the image to detect features from
      * @param keypoints the output vector of keypoints
      * @param descriptors the output matrix of descriptors
@@ -70,7 +70,7 @@ class FeatureDetector{
     void detectFeatures(const cv::Mat& img, std::vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) const;
     
      /**
-     * @brief method to detect the features of each model in the dataset
+     * @brief detect the features of each model in the dataset
      * @param models the vector of all models to detect features from
      * @param models_features the output vector of model features
      * @param image_filter the image filter to apply to the model image

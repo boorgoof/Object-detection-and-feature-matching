@@ -27,7 +27,7 @@ class Object_Type{
      */
     Object_Type(const Type& type) : type{type} {};
     /**
-     * @brief method to convert the enum Type to a string (e.g. "004_sugar_box").
+     * @brief convert the enum Type to a string (e.g. "004_sugar_box").
      */
     const std::string& to_string() const;
     const Type& get_type() const {return this->type;}
@@ -35,12 +35,11 @@ class Object_Type{
     /**
      * @brief sets the type of the object from a string (e.g. "004_sugar_box").
      * @param type the string representation of the type
-     * @note this method uses the string_to_enum method to convert the string to enum Type.
      */
     void set_type(const std::string& type) {this->type = string_to_enum(type);}
 
     /**
-     * @brief method to convert the string representation of the type to enum Type.
+     * @brief convert the string representation of the type to enum Type.
      */
     static const Type& string_to_enum(const std::string& type);
     /**
